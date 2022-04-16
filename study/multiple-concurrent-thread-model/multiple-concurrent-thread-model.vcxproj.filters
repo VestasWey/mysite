@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="iocp">
+      <UniqueIdentifier>{3fe6998c-fce1-46ef-9f94-49ac80f38a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="threading">
+      <UniqueIdentifier>{bcaaa566-905b-4cd5-99c9-10f6cbd797bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data_encapsulation">
+      <UniqueIdentifier>{ef738555-1727-404f-99d6-f170e455ee62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="synchronization">
+      <UniqueIdentifier>{a82051cf-7c4b-499d-9689-287df79d27bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logging">
+      <UniqueIdentifier>{20696bc2-89e2-4b38-b582-00d4362368bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="functional">
+      <UniqueIdentifier>{57ad407b-34bf-412c-945a-e17ce131beaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time">
+      <UniqueIdentifier>{7dc47c95-2720-493b-b652-12edf70d4851}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="message_loop">
+      <UniqueIdentifier>{635946f2-6cc5-4bf8-82e8-13c31041f1ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{cc58c893-466c-404f-91ed-78051288c5a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\socket">
+      <UniqueIdentifier>{6c63f262-39ab-4e22-8468-b7d518e2fe00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\pipe">
+      <UniqueIdentifier>{805c42d1-9482-4239-b8ae-050c8fbe7df0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ipc">
+      <UniqueIdentifier>{44aa4b83-ff78-4785-93e3-971f40305698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\url_request">
+      <UniqueIdentifier>{821b0d1d-e9d6-40ec-b27c-9d25c5cabc4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party">
+      <UniqueIdentifier>{edc5d2aa-f8ca-4509-a9d7-71fb0e642a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\base">
+      <UniqueIdentifier>{856fe825-b95f-4e94-a89d-2aee7c593b6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings">
+      <UniqueIdentifier>{0c74ffb0-85bc-4eb3-8683-e520cd3d3a09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="data_encapsulation\smart_pointer.h">
+      <Filter>data_encapsulation</Filter>
+    </ClInclude>
+    <ClInclude Include="iocp\iocp.h">
+      <Filter>iocp</Filter>
+    </ClInclude>
+    <ClInclude Include="threading\thread.h">
+      <Filter>threading</Filter>
+    </ClInclude>
+    <ClInclude Include="synchronization\waitable_event.h">
+      <Filter>synchronization</Filter>
+    </ClInclude>
+    <ClInclude Include="threading\thread_util.h">
+      <Filter>threading</Filter>
+    </ClInclude>
+    <ClInclude Include="logging\logging.h">
+      <Filter>logging</Filter>
+    </ClInclude>
+    <ClInclude Include="functional\callback.h">
+      <Filter>functional</Filter>
+    </ClInclude>
+    <ClInclude Include="time\time_util.h">
+      <Filter>time</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\run_loop.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\location.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\message_loop.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\message_pump.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\pending_task.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="message_loop\incoming_task_queue.h">
+      <Filter>message_loop</Filter>
+    </ClInclude>
+    <ClInclude Include="net\socket\server_socket.h">
+      <Filter>net\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="net\io_buffer_pool.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="net\pipe\pipe.h">
+      <Filter>net\pipe</Filter>
+    </ClInclude>
+    <ClInclude Include="threading\thread_checker.h">
+      <Filter>threading</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc\ipc_channel.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc\ipc_message.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="data_encapsulation\pickle.h">
+      <Filter>data_encapsulation</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc\ipc_listener.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="net\url_request\url_request.h">
+      <Filter>net\url_request</Filter>
+    </ClInclude>
+    <ClInclude Include="net\url_request\url_canon.h">
+      <Filter>net\url_request</Filter>
+    </ClInclude>
+    <ClInclude Include="net\url_request\url_request_context.h">
+      <Filter>net\url_request</Filter>
+    </ClInclude>
+    <ClInclude Include="net\url_request\url_fetcher.h">
+      <Filter>net\url_request</Filter>
+    </ClInclude>
+    <ClInclude Include="net\url_request\http_request_headers.h">
+      <Filter>net\url_request</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\base\md5.h">
+      <Filter>third_party\base</Filter>
+    </ClInclude>
+    <ClInclude Include="strings\string_util.h">
+      <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="synchronization\array.h">
+      <Filter>synchronization</Filter>
+    </ClInclude>
+    <ClInclude Include="synchronization\semaphore.h">
+      <Filter>synchronization</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="data_encapsulation\smart_pointer.cpp">
+      <Filter>data_encapsulation</Filter>
+    </ClCompile>
+    <ClCompile Include="iocp\iocp.cpp">
+      <Filter>iocp</Filter>
+    </ClCompile>
+    <ClCompile Include="threading\thread.cpp">
+      <Filter>threading</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\waitable_event.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="threading\thread_util.cpp">
+      <Filter>threading</Filter>
+    </ClCompile>
+    <ClCompile Include="logging\logging.cpp">
+      <Filter>logging</Filter>
+    </ClCompile>
+    <ClCompile Include="time\time_util.cpp">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\location.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\message_loop.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\message_pump.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\pending_task.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\run_loop.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="message_loop\incoming_task_queue.cpp">
+      <Filter>message_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="net\socket\server_socket.cpp">
+      <Filter>net\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="net\io_buffer_pool.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="net\pipe\pipe.cpp">
+      <Filter>net\pipe</Filter>
+    </ClCompile>
+    <ClCompile Include="threading\thread_checker.cpp">
+      <Filter>threading</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc\ipc_channel.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc\ipc_message.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="data_encapsulation\pickle.cpp">
+      <Filter>data_encapsulation</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc\ipc_listener.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="net\url_request\url_request.cpp">
+      <Filter>net\url_request</Filter>
+    </ClCompile>
+    <ClCompile Include="net\url_request\url_canon.cpp">
+      <Filter>net\url_request</Filter>
+    </ClCompile>
+    <ClCompile Include="net\url_request\url_request_context.cpp">
+      <Filter>net\url_request</Filter>
+    </ClCompile>
+    <ClCompile Include="net\url_request\url_fetcher.cpp">
+      <Filter>net\url_request</Filter>
+    </ClCompile>
+    <ClCompile Include="net\url_request\http_request_headers.cpp">
+      <Filter>net\url_request</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\base\md5.cc">
+      <Filter>third_party\base</Filter>
+    </ClCompile>
+    <ClCompile Include="strings\string_util.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\array.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\semaphore_win.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\semaphore.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\semaphore_posix.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="synchronization\semaphore_linux.cpp">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mctm.props" />
+  </ItemGroup>
+</Project>

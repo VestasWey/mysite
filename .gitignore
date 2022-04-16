@@ -1,0 +1,15 @@
+
+*.sdf
+*.suo
+*.aps
+*.user
+*.opensdf
+*.orig
+
+ipch/
+
+[Dd]ebug/
+[Rr]elease/
+*.config
+*.luaproj
+*.db

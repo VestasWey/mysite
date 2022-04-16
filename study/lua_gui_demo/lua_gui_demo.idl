@@ -1,0 +1,29 @@
+// lua_gui_demo.idl : lua_gui_demo.exe 的类型库源
+
+// 此文件将由 MIDL 编译器处理以产生
+// 类型库(lua_gui_demo.tlb)。
+
+[ uuid(1349EB28-6021-47CB-8598-C743BD4FF22F), version(1.0) ]
+library lua_gui_demo
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Clua_gui_demoDoc 的主调度接口
+	
+	[ uuid(C720E8CB-F20E-427B-8D0F-50FBB9279154) ]
+	dispinterface Ilua_gui_demo
+	{
+		properties:
+			
+		methods:
+	};
+
+	//  Clua_gui_demoDoc 的类信息
+	
+	[ uuid(74EFA0ED-FA22-45B1-B6E5-F724269C1ED3) ]
+	coclass lua_gui_demo
+	{
+		[default] dispinterface Ilua_gui_demo;
+	};
+};

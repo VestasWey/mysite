@@ -1,0 +1,13 @@
+
+*.sdf
+*.suo
+*.aps
+*.user
+*.opensdf
+
+ipch/
+
+[Dd]ebug/
+[Rr]elease/
+
+.vs/
