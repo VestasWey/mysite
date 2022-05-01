@@ -10,6 +10,7 @@ ipch/
 
 [Dd]ebug/
 [Rr]elease/
+out/
 *.config
 *.luaproj
 *.db
