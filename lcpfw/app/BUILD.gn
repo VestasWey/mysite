@@ -1,0 +1,231 @@
+
+include_dirs = [
+    "//lcpfw/app",
+]
+
+# group("app"){
+#     deps = [
+#         ":app_exec",
+#         ":app_exec",
+#     ]
+# }
+
+executable("app") {
+    cflags = []
+    sources = [
+        "app_main.cpp",
+        "main_dll_loader.h",
+        "main_dll_loader.cc",
+        "app_installation_rejecter.h",
+        "app_installation_rejecter.cpp"
+    ]
+
+    # include_dirs = [
+    #     "//app",
+    # ]
+
+    # defines = [
+    #     "ELECSTUDY_EXPORTS",
+    # ]
+
+    # configs += [
+    #     "//config:lcnfw_precompiled_headers",
+    #     "//config:lcpfw_include_dirs",
+    # ]
+
+    deps = [
+        ":common",
+        ":app_main"
+    ]
+}
+
+loadable_module("app_main") {
+    sources = [
+        "main/main_entry.cc",
+        "main/app_main_parts_impl.cc",
+        "main/app_main_parts_impl.h",
+        "main/app_main_extra_parts_views.cc",
+        "main/app_main_extra_parts_views.h",
+        "main/app_main_process_impl.cc",
+        "main/app_main_process_impl.h",
+        #"main/app_single_instance_guarantor.cpp",
+        #"main/app_single_instance_guarantor.h",
+
+        "main/profiles/prefs_register.cc",
+        "main/profiles/prefs_register.h",
+        "main/profiles/main_profile.cc",
+        "main/profiles/main_profile.h",
+    ]
+
+    defines = ["APP_LIB_IMPLEMENTATION"]
+
+    deps = [
+        "//base",
+        "//components/prefs",
+        "//components/pref_registry",
+        ":app_secret",
+        ":common",
+        ":content",
+        #":base_env"
+    ]
+}
+
+loadable_module("app_secret") {
+    sources = [
+        "secret/secret_entry.cc",
+        "secret/app_secret.cc",
+        "secret/app_secret.h",
+        "secret/network/common_types.cc",
+        "secret/network/common_types.h",
+        "secret/network/url_request/request_connection.h",
+        "secret/network/url_request/request_connection_impl.h",
+        "secret/network/url_request/request_connection_common_types.cc",
+        "secret/network/url_request/request_connection_common_types.h",
+        "secret/network/url_request/request_connection_context_getter.cc",
+        "secret/network/url_request/request_connection_context_getter.h",
+        "secret/network/url_request/request_connection_proxy.h",
+        "secret/network/url_request/request_context.cc",
+        "secret/network/url_request/request_context.h",
+        
+        "secret/services/context_service_impl.cc",
+        "secret/services/context_service.h",
+    ]
+
+    defines = ["APP_LIB_IMPLEMENTATION"]
+
+    deps = [
+        "//base",
+        "//components/prefs",
+        "//components/pref_registry",
+        "//net",
+        ":common",
+        ":utils",
+        #":base_env"
+    ]
+}
+
+source_set("common") {
+    sources = [
+        "common/app_constants.cpp",
+        "common/app_constants.h",
+        "common/app_context.cpp",
+        "common/app_context.h",
+        "common/app_features.cpp",
+        "common/app_features.h",
+        "common/app_logging.cpp",
+        "common/app_logging.h",
+        "common/app_paths_internal.h",
+        "common/app_paths.cc",
+        "common/app_paths.h",
+        
+        "common/app_pref_names.cpp",
+        "common/app_pref_names.h",
+        "common/app_result_codes.h",
+
+        "common/profiles/profile_impl.cc",
+        "common/profiles/profile_impl.h",
+        "common/profiles/profile.h",
+    ]
+
+    if(is_win){
+        sources += [
+            "common/app_context_win.cpp",
+            "common/app_paths_win.cc",
+        ]
+    }
+
+    if(is_mac){
+        sources += [
+            "common/app_context_mac.mm",
+            "common/app_paths_mac.cc",
+        ]
+    }
+
+    public_configs = [
+        "//config:lcpfw_precompiled_headers",
+        "//config:lcpfw_include_dirs",
+    ]
+
+    public_deps = [
+        "//base",
+        "//base:i18n",
+        "//components/pref_registry",
+        "//components/prefs",
+    ]
+}
+
+source_set("content") {
+    sources = [
+        "content/app_discardable_memory_allocator.cc",
+        "content/app_discardable_memory_allocator.h",
+        "content/app_main_extra_parts.h",
+        "content/app_main_parts.h",
+        "content/app_main_process.h",
+        "content/app_message_loop.cc",
+        "content/app_message_loop.h",
+        "content/app_post_task_helper.cc",
+        "content/app_post_task_helper.h",
+        "content/app_runner.cc",
+        "content/app_runner.h",
+        "content/app_thread.cc",
+        "content/app_thread.h",
+        "content/main_function_params.h",
+        "content/startup_task_runner.cc",
+        "content/startup_task_runner.h",
+        "content/app_task_environment.cc",
+        "content/app_task_environment.h",
+        #"content/app_scoped_run_loop_timeout.cc",
+        #"content/app_scoped_run_loop_timeout.h",
+    ]
+
+    # include_dirs = [
+    #     "//app",
+    # ]
+
+    public_configs = [
+        "//config:lcpfw_precompiled_headers",
+        "//config:lcpfw_include_dirs",
+    ]
+
+    public_deps = [
+        "//base",
+        "//base:i18n",
+    ]
+}
+
+source_set("utils") {
+    sources = [
+        "utils/app_tuple.h",
+    ]
+
+    public_configs = [
+        "//config:lcpfw_include_dirs",
+    ]
+
+    # public_deps = [
+    #     "//base",
+    #     "//base:i18n",
+    # ]
+}
+
+# 要使用chromium base库的常用功能所需要封装的组件，诸如：
+#   创建任务队列TaskQueue，才能进行PostTask
+#   创建任务执行器TaskRunner，才能进行PostTask并执行
+#   创建线程池Manager，后续才能使用依赖线程池的功能，比如Prefs配置文件读写服务
+# source_set("base_env") {
+#     sources = [
+#         "app_task_environment.h",
+#         "app_task_environment.cc",
+#         "app_discardable_memory_allocator.h",
+#         "app_discardable_memory_allocator.cc",
+#         "app_scoped_run_loop_timeout.h",
+#         "app_scoped_run_loop_timeout.cc",
+#     ]
+
+#     public_configs = [
+#         "//config:lcpfw_precompiled_headers",
+#         "//config:lcpfw_include_dirs",
+#     ]
+
+#     public_deps = ["//base"]
+# }

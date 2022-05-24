@@ -1,0 +1,57 @@
+Check failed: RunLoop::Run() timed out. Timeout set at AppTaskEnvironment@../../../app/content/app_task_environment.cc:415.
+{
+    "active_queues": [
+        {
+            "any_thread_.immediate_incoming_queuecapacity": 4,
+            "any_thread_.immediate_incoming_queuesize": 0,
+            "delay_to_next_task_ms": 557276.734,
+            // RunLoop退出时，任务队列里还剩有未执行的任务列表
+            "delayed_incoming_queue": [
+                {
+                    "delayed_run_time": 20957861.763,
+                    "delayed_run_time_milliseconds_from_now": 557276.968,
+                    "is_cancelled": false,
+                    "is_high_res": false,
+                    "nestable": true,
+                    "posted_from": "HighResolutionTimerManager@../../../base/timer/hi_res_timer_manager_win.cc:50",
+                    "sequence_num": 2
+                },
+                {
+                    "delayed_run_time": 21857863.818,   // 该task的计划执行时间，自系统启动以来的时间间隔，微秒
+                    "delayed_run_time_milliseconds_from_now": 1457279.023,  // 该task的预期执行时间距离现在的时间间隔
+                    "is_cancelled": false,
+                    "is_high_res": false,
+                    "nestable": true,
+                    "posted_from": "CreateThreads@../../../app/content/app_message_loop.cc:416",    // 该任务从哪里投递的
+                    "sequence_num": 4
+                }
+            ],
+            "delayed_incoming_queue_size": 2,
+            "delayed_work_queue": [],
+            "delayed_work_queue_capacity": 4,
+            "delayed_work_queue_size": 0,
+            "enabled": true,
+            "immediate_incoming_queue": [],
+            "immediate_work_queue": [],
+            "immediate_work_queue_capacity": 0,
+            "immediate_work_queue_size": 0,
+            "name": "lcpfw_task_environment_default",
+            "priority": "normal",
+            "task_queue_id": "0xf2d180",
+            "time_domain_name": "RealTimeDomain"
+        }
+    ],
+    "native_work_priority": "best_effort",
+    "queues_to_delete": [],
+    "queues_to_gracefully_shutdown": [],
+    "selector": {
+        "immediate_starvation_count": 0
+    },
+    "time_domains": [
+        {
+            "name": "RealTimeDomain",
+            "next_delay_ms": 557276.497,
+            "registered_delay_count": 1
+        }
+    ]
+}. 

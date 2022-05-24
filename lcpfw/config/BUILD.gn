@@ -1,0 +1,58 @@
+# 参照自chromium的“build\config\compiler\BUILD.gn”
+#
+# 这里存放非chromium相关项目的配置，用于lcpfw自身项目的编译配置，基本是对chromium默认参数的补充或小幅修改。
+# 一般情况下我们不需要再追加定义多个config配置目标，在从chromium拷贝过来的工具链脚本文件
+# “build\config\compiler\BUILD.gn”中，其已定义了很多常用的编译参数，其也是取其中的一部分配置
+# 目标作为全局工具链的默认编译配置，另外一些其只定义却并未使用到的编译配置可能正是我们针对自身
+# 项目想要单独设置的选项。如果在那里也没看到我们期望的配置目标，那么才需要在这里进行新增。
+#
+# lcpfw的编译配置与chromium的差别大概是这几个点：
+#   xxxxx
+
+config("lcpfw_precompiled_headers") {
+    if (is_win) {
+      # This is a string rather than a file GN knows about. It has to match
+      # exactly what's in the /FI flag below, and what might appear in the
+      # source code in quotes for an #include directive.
+      precompiled_header = "precompile.h"
+
+      # This is a file that GN will compile with the above header. It will be
+      # implicitly added to the sources (potentially multiple times, with one
+      # variant for each language used in the target).
+      precompiled_source = "//app/precompile.cc"
+
+      # Force include the header.
+      cflags = [ "/FI$precompiled_header" ]
+    } else if (is_mac) {
+      precompiled_source = "//app/precompile.h"
+    }
+}
+
+config("lcpfw_include_dirs") {
+    include_dirs = [
+        "//app",
+    ]
+}
+
+# config("lcpfw_no_treat_warnings_as_errors") {
+#   cflags = []
+#   cflags_c = []
+#   cflags_cc = []
+#   ldflags = []
+#   if (is_win) {
+#       cflags += [ "/WX" ]
+#   } else {
+#     cflags_cc = [ "-fno-exceptions" ]
+#     cflags_objcc = cflags_cc
+#   }
+# }
+
+# config("lcpfw_executable_configs") {
+#   cflags = []
+#   cflags_cc = []
+#   defines = []
+#   ldflags = []
+#   libs = []
+
+#   configs = ["//build/config/compiler:compiler"]
+# }

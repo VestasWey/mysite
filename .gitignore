@@ -6,11 +6,16 @@
 *.opensdf
 *.orig
 
-ipch/
+.idea/
+**/.vscode/
+.vscode/*
 
 [Dd]ebug/
 [Rr]elease/
 out/
+ipch/
+
 *.config
 *.luaproj
 *.db
+*.pyc

@@ -1,0 +1,26 @@
+# Copyright 2017 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//chrome/browser/vr/features.gni")
+import("//device/vr/buildflags/buildflags.gni")
+
+# Copies files to the gen/ directory and creates a manifest so that the VR
+# assets component can be used during Telemetry tests.
+action("generate_vr_assets_profile") {
+  script = "generate_vr_assets_profile.py"
+
+  # We should re-run anytime the version or any related files change.
+  inputs = [
+    "//chrome/browser/resources/vr/assets/google_chrome",
+    "//chrome/browser/resources/vr/assets/VERSION",
+    "//chrome/browser/resources/vr/assets/vr_assets_component_files.json",
+  ]
+  outputs = [ "$target_gen_dir/vr_assets_profile" ]
+  args = [
+    "--output",
+    rebase_path(target_gen_dir, root_build_dir),
+    "--asset-dir",
+    rebase_path("//chrome/browser/resources/vr/assets", root_build_dir),
+  ]
+}

@@ -1,0 +1,31 @@
+# Copyright 2015 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/chromeos/ui_mode.gni")
+import("//build/config/compiler/compiler.gni")
+if (is_android) {
+  # Pull in enable_chrome_android_internal and public_android_sdk
+  import("//build/config/android/config.gni")
+}
+
+if (is_chromeos_device) {
+  import("//build/config/chromeos/rules.gni")
+
+  generate_runner_script("cros_update_wrapper") {
+    generated_script = "$root_build_dir/bin/cros_update_wrapper"
+    deploy_chrome = true
+  }
+
+  if (cros_boards != "") {
+    foreach(_board, string_split(cros_boards, ":")) {
+      _board_underscore = string_replace(_board, "-", "_")
+      generate_runner_script("cros_update_wrapper_${_board_underscore}") {
+        generated_script =
+            "$root_build_dir/bin/cros_update_wrapper_${_board_underscore}"
+        deploy_chrome = true
+        override_board = _board
+      }
+    }
+  }
+}

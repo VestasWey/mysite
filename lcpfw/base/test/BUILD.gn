@@ -1,0 +1,82 @@
+# Copyright (c) 2013 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/compiled_action.gni")
+import("//build/config/chromeos/ui_mode.gni")
+import("//build/config/nacl/config.gni")
+import("//build/config/ui.gni")
+import("//build_overrides/build.gni")
+
+if (is_android) {
+  import("//build/config/android/rules.gni")
+}
+
+config("base_test_implementation") {
+  defines = [ "IS_BASE_TEST_IMPL" ]
+}
+
+config("perf_test_config") {
+  defines = [ "PERF_TEST" ]
+}
+
+# This shared library is dynamically loaded by ImmediateCrash unittests.
+shared_library("immediate_crash_test_helper") {
+  sources = [ "immediate_crash_test_helper.cc" ]
+
+  # Note: the helper has a header-only dependency on //base/immediate_helper.h.
+  # However, the build rule intentionally omits an explicit //base dependency
+  # to avoid potential ODR violations and minimize the amount of code linked in.
+
+  # Try to minimize the risk of non-official builds generating different code.
+  if (!is_official_build) {
+    configs -= [ "//build/config/compiler:default_optimization" ]
+    configs += [ "//build/config/compiler:optimize_max" ]
+  }
+
+  # Disable sanitization: sanitized builds are assumed to be saner than normal,
+  # and can affect codegen in surprising ways, which breaks the tests.
+  configs -= [ "//build/config/sanitizers:default_sanitizer_flags" ]
+
+  if (is_android) {
+    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
+  }
+}
+
+if (is_linux || is_chromeos) {
+  source_set("fontconfig_util_linux") {
+    sources = [
+      "fontconfig_util_linux.cc",
+      "fontconfig_util_linux.h",
+    ]
+    data_deps = [ ":fonts_conf" ]
+    deps = [
+      "//base",
+      "//third_party/fontconfig",
+    ]
+  }
+
+  copy("fonts_conf") {
+    sources = [ "fonts.conf" ]
+    outputs = [ "${root_build_dir}/etc/fonts/{{source_file_part}}" ]
+  }
+}
+
+if (is_ios) {
+  source_set("google_test_runner_shared_headers") {
+    sources = [ "ios/google_test_runner_delegate.h" ]
+  }
+
+  source_set("google_test_runner") {
+    sources = [ "ios/google_test_runner.mm" ]
+    deps = [
+      ":google_test_runner_shared_headers",
+      "//base",
+    ]
+    frameworks = [ "UIKit.framework" ]
+    configs += [
+      "//build/config/compiler:enable_arc",
+      "//build/config/ios:xctest_config",
+    ]
+  }
+}
