@@ -1,0 +1,49 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//mojo/public/tools/bindings/mojom.gni")
+
+if (!is_ios) {
+}
+
+source_set("struct_with_traits_impl") {
+  sources = [
+    "struct_with_traits_impl.cc",
+    "struct_with_traits_impl.h",
+  ]
+
+  deps = [
+    "//base",
+    "//mojo/public/cpp/system:system",
+  ]
+}
+
+source_set("mojo_public_bindings_test_utils") {
+  sources = [
+    "validation_test_input_parser.cc",
+    "validation_test_input_parser.h",
+  ]
+
+  deps = [
+    "//base",
+    "//mojo/public/c/system",
+  ]
+}
+
+action("generate_test_mojom") {
+  script = "generate_test_mojom.py"
+  outputs = [ "$target_gen_dir/generated.test-mojom" ]
+  args = [ rebase_path("$target_gen_dir/generated.test-mojom") ]
+}
+
+action("mojom_types_downgrader") {
+  script = "//mojo/public/tools/bindings/mojom_types_downgrader.py"
+  sources = [ "module_to_downgrade.test-mojom" ]
+  outputs = [ "$target_gen_dir/module_to_downgrade.test-mojom" ]
+  args = [
+    "--outdir",
+    rebase_path(target_gen_dir),
+    rebase_path("module_to_downgrade.test-mojom"),
+  ]
+}

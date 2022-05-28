@@ -10,8 +10,8 @@
 **/.vscode/
 .vscode/*
 
-[Dd]ebug/
-[Rr]elease/
+#[Dd]ebug/
+#[Rr]elease/
 out/
 ipch/
 

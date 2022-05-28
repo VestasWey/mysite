@@ -48,17 +48,17 @@ default_args = {
   ## TODO(bugs.webrtc.org/8396): Once WebRTC gets rid of its internal
   ## deps on codecs, we can remove this.
   #rtc_include_ilbc = false
-  #
-  ## Changes some setup for the Crashpad build to set them to build against
-  ## Chromium's zlib, base, etc.
-  #crashpad_dependencies = "chromium"
-  #
-  ## Override ANGLE's Vulkan dependencies.
-  #angle_vulkan_headers_dir = "//third_party/vulkan-deps/vulkan-headers/src"
-  #angle_vulkan_loader_dir = "//third_party/vulkan-deps/vulkan-loader/src"
-  #angle_vulkan_tools_dir = "//third_party/vulkan-deps/vulkan-tools/src"
-  #angle_vulkan_validation_layers_dir = "//third_party/vulkan-deps/vulkan-validation-layers/src"
 #]modify
+
+  # Changes some setup for the Crashpad build to set them to build against
+  # Chromium's zlib, base, etc.
+  crashpad_dependencies = "chromium"
+
+  # Override ANGLE's Vulkan dependencies.
+  angle_vulkan_headers_dir = "//third_party/vulkan-deps/vulkan-headers/src"
+  angle_vulkan_loader_dir = "//third_party/vulkan-deps/vulkan-loader/src"
+  angle_vulkan_tools_dir = "//third_party/vulkan-deps/vulkan-tools/src"
+  angle_vulkan_validation_layers_dir = "//third_party/vulkan-deps/vulkan-validation-layers/src"
 }
 
 # These are the targets to skip header checking by default. The files in targets
@@ -192,6 +192,7 @@ exec_script_whitelist =
       # with other repos. The entries in this list should be only for files
       # in the Chromium repo outside of //build.
       "//build_overrides/build.gni",
+      "//third_party/angle/BUILD.gn",
 
 #modify[
       #"//chrome/android/webapk/shell_apk/prepare_upload_dir/BUILD.gn",

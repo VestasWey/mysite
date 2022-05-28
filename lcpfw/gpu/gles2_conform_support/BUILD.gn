@@ -1,0 +1,88 @@
+# Copyright 2015 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+declare_args() {
+  # Set to true to compile with the OpenGL ES 2.0 conformance tests.
+  internal_gles2_conform_tests = false
+}
+
+config("gles2_conform_test_warnings") {
+  if (is_clang) {
+    cflags = [
+      "-Wno-array-bounds",
+      "-Wno-implicit-function-declaration",
+      "-Wno-logical-op-parentheses",
+
+      # Many struct initializers in the GTF_ES code are missing braces.
+      "-Wno-missing-braces",
+      "-Wno-parentheses-equality",
+      "-Wno-pointer-sign",
+      "-Wno-return-type",
+      "-Wno-sign-compare",
+      "-Wno-sizeof-pointer-memaccess",
+
+      # A few variables are unitialized if GLVersion != 2.0.
+      "-Wno-sometimes-uninitialized",
+      "-Wno-tautological-compare",
+
+      # GTFVecBase.h contains static no-inline functions in a header :-/
+      "-Wno-unused-function",
+      "-Wno-unused-variable",
+
+      # There are some implicit conversions from "int" to "char" in
+      # GTFExtensionTestSurfacelessContext.c.
+      "-Wno-constant-conversion",
+    ]
+  }
+}
+
+import("//testing/test.gni")
+
+executable("gles2_conform_support") {
+  sources = [
+    "gles2_conform_support.c",
+    "native/egl_native.cc",
+    "native/main.cc",
+  ]
+  defines = [
+    "GLES2_CONFORM_SUPPORT_ONLY",
+    "GTF_GLES20",
+    "EGLAPI=",
+    "EGLAPIENTRY=",
+  ]
+  deps = [
+    "//base",
+    "//base/third_party/dynamic_annotations",
+    "//build/win:default_exe_manifest",
+    "//gpu/command_buffer/client:gles2_c_lib_nocheck",
+    "//gpu/gles2_conform_support/egl",
+    "//ui/gl",
+  ]
+  if (is_linux || is_chromeos) {
+    sources += [
+      "native/egl_native_aura.cc",
+      "native/egl_native_x11.cc",
+    ]
+  }
+}
+
+if (internal_gles2_conform_tests) {
+  action("generate_gles2_conform_embedded_data") {
+    script = "generate_gles2_embedded_data.py"
+    outputs = [
+      "$target_gen_dir/gles2_conform_test_embedded_data/FilesDATA.c",
+      "$target_gen_dir/gles2_conform_test_embedded_data/FilesDATA.h",
+      "$target_gen_dir/gles2_conform_test_embedded_data/FilesTOC.c",
+    ]
+    args = [
+      rebase_path("//third_party/gles2_conform/GTF_ES/glsl/GTF"),
+      rebase_path("$target_gen_dir/gles2_conform_test_embedded_data"),
+    ]
+  }
+  action("generate_gles2_conform_tests") {
+    script = "generate_gles2_conform_tests.py"
+    outputs = [ "$target_gen_dir/gles2_conform_test_autogen.cc" ]
+    args = [ rebase_path("$target_gen_dir") ]
+  }
+}

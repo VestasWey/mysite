@@ -1,0 +1,75 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/chromeos/ui_mode.gni")
+import("//tools/grit/grit_rule.gni")
+import("//tools/grit/repack.gni")
+import("//ui/webui/webui_features.gni")
+
+group("resources") {
+  public_deps = [
+    ":ui_resources_grd",
+    ":ui_unscaled_resources_grd",
+    #":webui_generated_resources_grd",
+    #":webui_resources_grd",
+  ]
+}
+
+grit("ui_resources_grd") {
+  source = "ui_resources.grd"
+  outputs = [
+    "grit/ui_resources.h",
+    "grit/ui_resources_map.cc",
+    "grit/ui_resources_map.h",
+    "ui_resources_100_percent.pak",
+    "ui_resources_200_percent.pak",
+    "ui_resources_300_percent.pak",
+  ]
+}
+
+grit("ui_unscaled_resources_grd") {
+  source = "ui_unscaled_resources.grd"
+  outputs = [
+    "grit/ui_unscaled_resources.h",
+    "ui_unscaled_resources.rc",
+  ]
+}
+
+# grit("webui_resources_grd") {
+#   defines = [ "optimize_webui=$optimize_webui" ]
+#   source = "../webui/resources/webui_resources.grd"
+
+#   deps = [ "//ui/webui/resources:modulize" ]
+#   if (is_chromeos_ash) {
+#     deps += [ "//ui/chromeos/colors:cros_colors_css" ]
+#   }
+
+#   outputs = [
+#     "grit/webui_resources.h",
+#     "grit/webui_resources_map.cc",
+#     "grit/webui_resources_map.h",
+#     "webui_resources.pak",
+#   ]
+# }
+
+# grit("webui_generated_resources_grd") {
+#   enable_input_discovery_for_gn_analyze = false
+#   source = "$root_gen_dir/ui/webui/resources/webui_generated_resources.grd"
+#   deps = [ "//ui/webui/resources:build_grd" ]
+
+#   outputs = [
+#     "grit/webui_generated_resources.h",
+#     "grit/webui_generated_resources_map.cc",
+#     "grit/webui_generated_resources_map.h",
+#     "webui_generated_resources.pak",
+#   ]
+# }
+
+if (!is_mac) {
+  copy("copy_ui_resources_100_percent") {
+    sources = [ "$root_gen_dir/ui/resources/ui_resources_100_percent.pak" ]
+    outputs = [ "$root_out_dir/ui_resources_100_percent.pak" ]
+    deps = [ "//ui/resources" ]
+  }
+}

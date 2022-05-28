@@ -1,0 +1,243 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/android/config.gni")
+import("//build/config/chromeos/ui_mode.gni")
+import("//build/config/features.gni")
+import("//build/config/ui.gni")
+import("//testing/test.gni")
+import("//third_party/protobuf/proto_library.gni")
+
+proto_library("logging_proto") {
+  sources = [ "logging/proto/raw_events.proto" ]
+}
+
+# Common code shared by all cast components.
+source_set("common") {
+  sources = [
+    "cast_config.cc",
+    "cast_config.h",
+    "cast_environment.cc",
+    "cast_environment.h",
+    "common/clock_drift_smoother.cc",
+    "common/clock_drift_smoother.h",
+    "common/expanded_value_base.h",
+    "common/frame_id.cc",
+    "common/frame_id.h",
+    "common/rtp_time.cc",
+    "common/rtp_time.h",
+    "common/transport_encryption_handler.cc",
+    "common/transport_encryption_handler.h",
+    "constants.h",
+    "logging/encoding_event_subscriber.cc",
+    "logging/encoding_event_subscriber.h",
+    "logging/log_event_dispatcher.cc",
+    "logging/log_event_dispatcher.h",
+    "logging/logging_defines.cc",
+    "logging/logging_defines.h",
+    "logging/proto/proto_utils.cc",
+    "logging/proto/proto_utils.h",
+    "logging/raw_event_subscriber.h",
+    "logging/raw_event_subscriber_bundle.cc",
+    "logging/raw_event_subscriber_bundle.h",
+    "logging/receiver_time_offset_estimator.h",
+    "logging/receiver_time_offset_estimator_impl.cc",
+    "logging/receiver_time_offset_estimator_impl.h",
+    "logging/simple_event_subscriber.cc",
+    "logging/simple_event_subscriber.h",
+    "logging/stats_event_subscriber.cc",
+    "logging/stats_event_subscriber.h",
+  ]
+
+  deps = [
+    ":logging_proto",
+    "//base",
+    "//crypto",
+    "//net",
+    "//third_party/zlib",
+  ]
+
+  public_deps = [
+    # The generated headers reference headers within protobuf_lite, so
+    # dependencies must be able to find those headers too.
+    ":logging_proto",
+  ]
+}
+
+source_set("net") {
+  sources = [
+    "net/cast_transport.h",
+    "net/cast_transport_config.cc",
+    "net/cast_transport_config.h",
+    "net/cast_transport_defines.h",
+    "net/cast_transport_impl.cc",
+    "net/cast_transport_impl.h",
+    "net/pacing/paced_sender.cc",
+    "net/pacing/paced_sender.h",
+    "net/rtcp/receiver_rtcp_event_subscriber.cc",
+    "net/rtcp/receiver_rtcp_event_subscriber.h",
+    "net/rtcp/receiver_rtcp_session.cc",
+    "net/rtcp/receiver_rtcp_session.h",
+    "net/rtcp/rtcp_builder.cc",
+    "net/rtcp/rtcp_builder.h",
+    "net/rtcp/rtcp_defines.cc",
+    "net/rtcp/rtcp_defines.h",
+    "net/rtcp/rtcp_utility.cc",
+    "net/rtcp/rtcp_utility.h",
+    "net/rtcp/sender_rtcp_session.cc",
+    "net/rtcp/sender_rtcp_session.h",
+    "net/rtp/packet_storage.cc",
+    "net/rtp/packet_storage.h",
+    "net/rtp/rtp_defines.cc",
+    "net/rtp/rtp_defines.h",
+    "net/rtp/rtp_packetizer.cc",
+    "net/rtp/rtp_packetizer.h",
+    "net/rtp/rtp_parser.cc",
+    "net/rtp/rtp_parser.h",
+    "net/rtp/rtp_sender.cc",
+    "net/rtp/rtp_sender.h",
+    "net/transport_util.cc",
+    "net/transport_util.h",
+    "net/udp_packet_pipe.cc",
+    "net/udp_packet_pipe.h",
+    "net/udp_transport_impl.cc",
+    "net/udp_transport_impl.h",
+    "net/udp_transport_interface.h",
+  ]
+
+  deps = [
+    ":common",
+    "//base",
+    "//media/mojo/common",
+    "//mojo/public/cpp/system",
+    "//net",
+  ]
+
+  public_deps = [ ":common" ]
+}
+
+source_set("sender") {
+  sources = [
+    "cast_sender.h",
+    "cast_sender_impl.cc",
+    "cast_sender_impl.h",
+    "sender/audio_encoder.cc",
+    "sender/audio_encoder.h",
+    "sender/audio_sender.cc",
+    "sender/audio_sender.h",
+    "sender/congestion_control.cc",
+    "sender/congestion_control.h",
+    "sender/external_video_encoder.cc",
+    "sender/external_video_encoder.h",
+    "sender/fake_software_video_encoder.cc",
+    "sender/fake_software_video_encoder.h",
+    "sender/frame_sender.cc",
+    "sender/frame_sender.h",
+    "sender/performance_metrics_overlay.cc",
+    "sender/performance_metrics_overlay.h",
+    "sender/sender_encoded_frame.cc",
+    "sender/sender_encoded_frame.h",
+    "sender/size_adaptable_video_encoder_base.cc",
+    "sender/size_adaptable_video_encoder_base.h",
+    "sender/software_video_encoder.h",
+    "sender/video_encoder.cc",
+    "sender/video_encoder.h",
+    "sender/video_encoder_impl.cc",
+    "sender/video_encoder_impl.h",
+    "sender/video_frame_factory.h",
+    "sender/video_sender.cc",
+    "sender/video_sender.h",
+    "sender/vp8_encoder.cc",
+    "sender/vp8_encoder.h",
+    "sender/vp8_quantizer_parser.cc",
+    "sender/vp8_quantizer_parser.h",
+  ]
+
+  deps = [
+    ":common",
+    ":net",
+    "//base",
+    "//media",
+    "//third_party/libvpx",
+    "//third_party/opus",
+    "//ui/gfx/geometry",
+  ]
+
+  # iOS and OS X encoders
+  if (is_apple) {
+    sources += [
+      "sender/h264_vt_encoder.cc",
+      "sender/h264_vt_encoder.h",
+    ]
+
+    frameworks = [
+      "AudioToolbox.framework",
+      "CoreFoundation.framework",
+      "CoreMedia.framework",
+      "CoreVideo.framework",
+      "VideoToolbox.framework",
+    ]
+  }
+}
+
+source_set("receiver") {
+  sources = [
+    "cast_receiver.h",
+    "net/rtp/cast_message_builder.cc",
+    "net/rtp/cast_message_builder.h",
+    "net/rtp/frame_buffer.cc",
+    "net/rtp/frame_buffer.h",
+    "net/rtp/framer.cc",
+    "net/rtp/framer.h",
+    "net/rtp/receiver_stats.cc",
+    "net/rtp/receiver_stats.h",
+    "receiver/audio_decoder.cc",
+    "receiver/audio_decoder.h",
+    "receiver/cast_receiver_impl.cc",
+    "receiver/cast_receiver_impl.h",
+    "receiver/frame_receiver.cc",
+    "receiver/frame_receiver.h",
+    "receiver/video_decoder.cc",
+    "receiver/video_decoder.h",
+  ]
+
+  deps = [
+    ":common",
+    ":net",
+    "//base",
+    "//media",
+    "//third_party/libvpx",
+    "//third_party/libyuv",
+    "//third_party/opus",
+    "//ui/gfx/geometry",
+  ]
+}
+
+if (is_win || is_mac || is_linux || is_chromeos_lacros) {
+  proto_library("network_simulation_model_proto") {
+    visibility = [ ":cast_simulator" ]
+    sources = [ "test/proto/network_simulation_model.proto" ]
+  }
+
+} else {  # !(is_win || is_mac || is_linux || is_chromeos_lacros)
+  # The testing tools are only built for the desktop platforms.
+  group("testing_tools") {
+  }
+}
+
+# Projects external to Chromium can build cast_sender and/or cast_receiver to
+# produce libraries to link with their applications.  Chromium targets should
+# not reference these.
+
+static_library("cast_sender") {
+  complete_static_lib = true
+  configs -= [ "//build/config/compiler:thin_archive" ]
+  deps = [ ":sender" ]
+}
+
+static_library("cast_receiver") {
+  complete_static_lib = true
+  configs -= [ "//build/config/compiler:thin_archive" ]
+  deps = [ ":receiver" ]
+}

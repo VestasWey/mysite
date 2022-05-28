@@ -1,0 +1,151 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/chromeos/ui_mode.gni")
+import("//build/config/ui.gni")
+import("//gpu/vulkan/features.gni")
+import("//testing/libfuzzer/fuzzer_test.gni")
+import("//testing/test.gni")
+import("//third_party/protobuf/proto_library.gni")
+import("//ui/gl/features.gni")
+
+config("gpu_implementation") {
+  defines = [ "GPU_IMPLEMENTATION" ]
+  configs = [
+    "//build/config/compiler:noshadowing",
+    "//build/config/compiler:wexit_time_destructors",
+  ]
+}
+
+config("gpu_gles2_implementation") {
+  defines = [ "GPU_GLES2_IMPLEMENTATION" ]
+  configs = [
+    "//build/config/compiler:noshadowing",
+    "//build/config/compiler:wexit_time_destructors",
+  ]
+}
+
+config("gpu_util_implementation") {
+  defines = [ "GPU_UTIL_IMPLEMENTATION" ]
+  configs = [
+    "//build/config/compiler:noshadowing",
+    "//build/config/compiler:wexit_time_destructors",
+  ]
+}
+
+config("raster_implementation") {
+  defines = [ "RASTER_IMPLEMENTATION" ]
+  configs = [
+    "//build/config/compiler:noshadowing",
+    "//build/config/compiler:wexit_time_destructors",
+  ]
+}
+
+config("webgpu_implementation") {
+  defines = [ "WEBGPU_IMPLEMENTATION" ]
+  configs = [
+    "//build/config/compiler:noshadowing",
+    "//build/config/compiler:wexit_time_destructors",
+  ]
+}
+
+component("gpu") {
+  public_deps = [
+    "//gpu/command_buffer/client:client_sources",
+    "//gpu/command_buffer/common:common_sources",
+    "//gpu/command_buffer/service:service_sources",
+    "//gpu/config:config_sources",
+    "//gpu/ipc/client:ipc_client_sources",
+    "//gpu/ipc/common:ipc_common_sources",
+  ]
+}
+
+component("gles2") {
+  public_deps = [
+    "//gpu/command_buffer/client:gles2_cmd_helper_sources",
+    "//gpu/command_buffer/common:gles2_sources",
+    "//gpu/command_buffer/common:raster_sources",
+    "//gpu/command_buffer/service:gles2_sources",
+  ]
+}
+
+component("raster") {
+  public_deps = [ "//gpu/command_buffer/client:raster_sources" ]
+}
+
+component("mailbox") {
+  defines = [ "IS_GPU_MAILBOX_IMPL" ]
+  public_deps = [ "//gpu/command_buffer/common:mailbox_sources" ]
+}
+
+# component("webgpu") {
+#   public_deps = [ "//gpu/command_buffer/client:webgpu_sources" ]
+# }
+
+if (!use_static_angle) {
+  shared_library("command_buffer_gles2") {
+    sources = [
+      # TODO(hendrikw): Move egl out of gles2_conform_support.
+      "gles2_conform_support/egl/config.cc",
+      "gles2_conform_support/egl/config.h",
+      "gles2_conform_support/egl/context.cc",
+      "gles2_conform_support/egl/context.h",
+      "gles2_conform_support/egl/display.cc",
+      "gles2_conform_support/egl/display.h",
+      "gles2_conform_support/egl/egl.cc",
+      "gles2_conform_support/egl/surface.cc",
+      "gles2_conform_support/egl/surface.h",
+      "gles2_conform_support/egl/test_support.cc",
+      "gles2_conform_support/egl/test_support.h",
+      "gles2_conform_support/egl/thread_state.cc",
+      "gles2_conform_support/egl/thread_state.h",
+    ]
+
+    deps = [
+      ":gpu",
+      "//base",
+      "//gpu/command_buffer/client:gles2_c_lib",
+      "//gpu/command_buffer/client:gles2_cmd_helper",
+      "//gpu/command_buffer/client:gles2_implementation",
+      "//gpu/command_buffer/service:gles2",
+      "//ui/gl",
+      "//ui/gl/init",
+    ]
+
+    defines = [
+      "COMMAND_BUFFER_GLES_LIB_SUPPORT_ONLY",
+      "EGLAPIENTRY=",
+    ]
+    if (is_android) {
+      configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
+    }
+    if (current_os == "win") {
+      defines += [ "EGLAPI=__declspec(dllexport)" ]
+    } else {
+      defines += [ "EGLAPI=__attribute__((visibility(\"default\")))" ]
+    }
+  }
+}  # if (!use_static_angle)
+
+if (!is_android && !is_fuchsia && !is_chromeos_ash) {
+  proto_library("gl_lpm_fuzzer_proto") {
+    sources = [ "command_buffer/tests/lpm/gl_lpm_fuzzer.proto" ]
+
+    use_protobuf_full = true
+    deps = [ "//third_party/protobuf:protobuf_full" ]
+  }
+
+  static_library("gl_lpm_shader_to_string") {
+    sources = [
+      "command_buffer/tests/lpm/gl_lpm_shader_to_string.cc",
+      "command_buffer/tests/lpm/gl_lpm_shader_to_string.h",
+    ]
+
+    deps = [
+      ":gl_lpm_fuzzer_proto",
+      "//base:base",
+    ]
+  }
+
+}

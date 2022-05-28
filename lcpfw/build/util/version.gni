@@ -61,89 +61,89 @@ if (is_mac) {
   }
 }
 
-_script_arguments += [
-  "-f",
-  rebase_path(chrome_version_file, root_build_dir),
-  "-t",
-  _version_dictionary_template,
-  "--os",
-  target_os,
-]
+# _script_arguments += [
+#   "-f",
+#   rebase_path(chrome_version_file, root_build_dir),
+#   "-t",
+#   _version_dictionary_template,
+#   "--os",
+#   target_os,
+# ]
 
-_result = exec_script("version.py",
-                      _script_arguments,
-                      "scope",
-                      [
-                        chrome_version_file,
-                        "android_chrome_version.py",
-                      ])
+# _result = exec_script("version.py",
+#                       _script_arguments,
+#                       "scope",
+#                       [
+#                         chrome_version_file,
+#                         "android_chrome_version.py",
+#                       ])
 
-# Full version. For example "45.0.12321.0"
-chrome_version_full = _result.full
+# # Full version. For example "45.0.12321.0"
+# chrome_version_full = _result.full
 
-# The consituent parts of the full version.
-chrome_version_major = _result.major
-chrome_version_minor = _result.minor
-chrome_version_build = _result.build
-chrome_version_patch = _result.patch
+# # The consituent parts of the full version.
+# chrome_version_major = _result.major
+# chrome_version_minor = _result.minor
+# chrome_version_build = _result.build
+# chrome_version_patch = _result.patch
 
-if (is_mac) {
-  chrome_version_patch_hi = _result.patch_hi
-  chrome_version_patch_lo = _result.patch_lo
+# if (is_mac) {
+#   chrome_version_patch_hi = _result.patch_hi
+#   chrome_version_patch_lo = _result.patch_lo
 
-  chrome_dylib_version = "$chrome_version_build.$chrome_version_patch_hi" +
-                         ".$chrome_version_patch_lo"
-} else if (target_os == "android") {
-  forward_variables_from(_result,
-                         [
-                           "chrome_modern_version_code",
-                           "chrome_version_code",
-                           "monochrome_version_code",
-                           "monochrome_32_version_code",
-                           "monochrome_32_64_version_code",
-                           "monochrome_64_32_version_code",
-                           "monochrome_64_version_code",
-                           "trichrome_version_code",
-                           "trichrome_32_version_code",
-                           "trichrome_32_64_version_code",
-                           "trichrome_64_32_version_code",
-                           "trichrome_64_version_code",
-                           "webview_beta_version_code",
-                           "webview_dev_version_code",
-                           "webview_stable_version_code",
-                           "webview_32_beta_version_code",
-                           "webview_32_dev_version_code",
-                           "webview_32_stable_version_code",
-                         ])
+#   chrome_dylib_version = "$chrome_version_build.$chrome_version_patch_hi" +
+#                          ".$chrome_version_patch_lo"
+# } else if (target_os == "android") {
+#   forward_variables_from(_result,
+#                          [
+#                            "chrome_modern_version_code",
+#                            "chrome_version_code",
+#                            "monochrome_version_code",
+#                            "monochrome_32_version_code",
+#                            "monochrome_32_64_version_code",
+#                            "monochrome_64_32_version_code",
+#                            "monochrome_64_version_code",
+#                            "trichrome_version_code",
+#                            "trichrome_32_version_code",
+#                            "trichrome_32_64_version_code",
+#                            "trichrome_64_32_version_code",
+#                            "trichrome_64_version_code",
+#                            "webview_beta_version_code",
+#                            "webview_dev_version_code",
+#                            "webview_stable_version_code",
+#                            "webview_32_beta_version_code",
+#                            "webview_32_dev_version_code",
+#                            "webview_32_stable_version_code",
+#                          ])
 
-  chrome_version_name = chrome_version_full
+#   chrome_version_name = chrome_version_full
 
-  lines_to_write = [
-    "VersionName: $chrome_version_name",
-    "Chrome: $chrome_version_code",
-    "ChromeModern: $chrome_modern_version_code",
-    "Monochrome: $monochrome_version_code",
-    "TrichromeChrome: $trichrome_version_code",
-    "AndroidWebviewStable: $webview_stable_version_code",
-    "AndroidWebviewBeta: $webview_beta_version_code",
-    "AndroidWebviewDev: $webview_dev_version_code",
-  ]
+#   lines_to_write = [
+#     "VersionName: $chrome_version_name",
+#     "Chrome: $chrome_version_code",
+#     "ChromeModern: $chrome_modern_version_code",
+#     "Monochrome: $monochrome_version_code",
+#     "TrichromeChrome: $trichrome_version_code",
+#     "AndroidWebviewStable: $webview_stable_version_code",
+#     "AndroidWebviewBeta: $webview_beta_version_code",
+#     "AndroidWebviewDev: $webview_dev_version_code",
+#   ]
 
-  if (target_cpu == "arm64" || target_cpu == "x64") {
-    lines_to_write += [
-      "Monochrome32: $monochrome_32_version_code",
-      "Monochrome3264: $monochrome_32_64_version_code",
-      "Monochrome6432: $monochrome_64_32_version_code",
-      "Monochrome64: $monochrome_64_version_code",
-      "TrichromeChrome32: $trichrome_32_version_code",
-      "TrichromeChrome3264: $trichrome_32_64_version_code",
-      "TrichromeChrome6432: $trichrome_64_32_version_code",
-      "TrichromeChrome64: $trichrome_64_version_code",
-      "AndroidWebview32Stable: $webview_32_stable_version_code",
-      "AndroidWebview32Beta: $webview_32_beta_version_code",
-      "AndroidWebview32Dev: $webview_32_dev_version_code",
-    ]
-  }
+#   if (target_cpu == "arm64" || target_cpu == "x64") {
+#     lines_to_write += [
+#       "Monochrome32: $monochrome_32_version_code",
+#       "Monochrome3264: $monochrome_32_64_version_code",
+#       "Monochrome6432: $monochrome_64_32_version_code",
+#       "Monochrome64: $monochrome_64_version_code",
+#       "TrichromeChrome32: $trichrome_32_version_code",
+#       "TrichromeChrome3264: $trichrome_32_64_version_code",
+#       "TrichromeChrome6432: $trichrome_64_32_version_code",
+#       "TrichromeChrome64: $trichrome_64_version_code",
+#       "AndroidWebview32Stable: $webview_32_stable_version_code",
+#       "AndroidWebview32Beta: $webview_32_beta_version_code",
+#       "AndroidWebview32Dev: $webview_32_dev_version_code",
+#     ]
+#   }
 
-  write_file("$root_out_dir/android_chrome_versions.txt", lines_to_write)
-}
+#   write_file("$root_out_dir/android_chrome_versions.txt", lines_to_write)
+# }

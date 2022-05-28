@@ -35,7 +35,7 @@ executable("app") {
 
     deps = [
         ":common",
-        ":app_main"
+        ":app_main",
     ]
 }
 
@@ -67,6 +67,12 @@ loadable_module("app_main") {
         ":common",
         ":content",
         #":base_env"
+
+        # ui deps modules
+        "//ui/base",
+        #"//components/crash/core/common",
+        #"//ui/gfx",
+        #"//services/metrics"
     ]
 }
 

@@ -61,6 +61,7 @@ group("gn_all") {
   deps = [
     ":gn_visibility",
     "//base",
+    "//ui/base:base",
 
     # customer
     "//examples:tests_console",

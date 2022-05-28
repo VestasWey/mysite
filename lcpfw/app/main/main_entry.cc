@@ -10,6 +10,7 @@
 #include "base/i18n/icu_util.h"
 #include "base/lazy_instance.h"
 #include "base/logging.h"
+#include "base/path_service.h"
 #include "base/power_monitor/power_monitor.h"
 #include "base/power_monitor/power_monitor_device_source.h"
 #include "base/process/launch.h"
@@ -20,9 +21,9 @@
 //#include "components/viz/common/features.h"
 
 //#include "mojo/core/embedder/embedder.h"
-//#include "ui/base/ui_base_paths.h"
+#include "ui/base/ui_base_paths.h"
 //#include "ui/base/ime/init/input_method_initializer.h"
-//#include "ui/base/resource/resource_bundle.h"
+#include "ui/base/resource/resource_bundle.h"
 //#include "ui/compositor/compositor_switches.h"
 //#include "ui/compositor/app_in_process_context_factory.h"
 //#include "ui/compositor/app_context_factories.h"
@@ -42,7 +43,7 @@
 //#endif
 
 #if defined(OS_WIN)
-//#include "ui/base/win/scoped_ole_initializer.h"
+#include "ui/base/win/scoped_ole_initializer.h"
 //#include "ui/views/examples/examples_skia_gold_pixel_diff.h"
 #endif
 
@@ -56,6 +57,8 @@
 #include "common/app_paths.h"
 #include "content/app_runner.h"
 #include "main/app_main_parts_impl.h"
+#include "ui/display/screen.h"
+#include "ui/display/win/screen_win.h"
 
 
 namespace {
@@ -93,12 +96,12 @@ APP_LIB_EXPORT int AppMainEntry()
 
     base::AtExitManager exit_manager;
 
-//#ifdef OS_WIN
-//    // Ole must be initialized before starting message pump, so that TSF
-//    // (Text Services Framework) module can interact with the message pump
-//    // on Windows 8 Metro mode.
-//    ui::ScopedOleInitializer ole_initializer;
-//#endif
+#ifdef OS_WIN
+    // Ole must be initialized before starting message pump, so that TSF
+    // (Text Services Framework) module can interact with the message pump
+    // on Windows 8 Metro mode.
+    ui::ScopedOleInitializer ole_initializer;
+#endif
 
     base::EnableTerminationOnHeapCorruption();
     base::EnableTerminationOnOutOfMemory();
@@ -144,15 +147,20 @@ APP_LIB_EXPORT int AppMainEntry()
     base::i18n::InitializeICU();
 
     lcpfw::RegisterPathProvider();
-    //ui::RegisterPathProvider();
+    ui::RegisterPathProvider();
     
-    /*base::FilePath ui_test_pak_path;
-    CHECK(base::PathService::Get(ui::UI_TEST_PAK, &ui_test_pak_path));
-    ui::ResourceBundle::InitSharedInstanceWithPakPath(ui_test_pak_path);
+    base::FilePath locales_pak_path;
+    CHECK(base::PathService::Get(base::DIR_MODULE, &locales_pak_path));
+    locales_pak_path = locales_pak_path.Append(FILE_PATH_LITERAL("zh-CN.pak"));
+    // InitSharedInstanceWithPakPath将pak用于图片资源和字符串资源，所以初始化ResourceBundle时应该先传入字符串资源包（当然这个包也可以是字符串和图片等其他资源的完全体整合包）
+    ui::ResourceBundle::InitSharedInstanceWithPakPath(locales_pak_path);
 
-    base::FilePath views_examples_resources_pak_path;
+    auto& rb = ui::ResourceBundle::GetSharedInstance();
+    auto ss = rb.GetLocalizedString(32533);
+
+    /*base::FilePath views_examples_resources_pak_path;
     CHECK(base::PathService::Get(base::DIR_MODULE,
-                                &views_examples_resources_pak_path));
+        &views_examples_resources_pak_path));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
         views_examples_resources_pak_path.AppendASCII(
             "views_examples_resources.pak"),
@@ -204,13 +212,26 @@ APP_LIB_EXPORT int AppMainEntry()
 
     result_code = main_runner->Run();
 
+#ifdef OS_WIN
+    display::win::ScreenWin scw;
+    display::Screen::SetScreenInstance(&scw);
+#endif
+    auto screen = display::Screen::GetScreen();
+    auto displays = screen->GetAllDisplays();
+    gfx::Point pt = screen->GetCursorScreenPoint();
+    for (auto& display : displays)
+    {
+        auto rect = display.work_area();
+        LOG(INFO) << rect.ToString();
+    }
+
     main_runner->Shutdown();
 
     if (result_code == lcpfw::ResultCodeRestartApp) {
         RestartApp();
     }
 
-//    ui::ResourceBundle::CleanupSharedInstance();
+    ui::ResourceBundle::CleanupSharedInstance();
 //
 //    ui::ShutdownInputMethod();
 //

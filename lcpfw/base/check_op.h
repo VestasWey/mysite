@@ -187,6 +187,9 @@ class CheckOpResult {
                                     CheckOpValueStr(v2));                      \
   }
 
+#ifdef _MSC_VER
+#pragma warning(disable:4805)   // warning C4805: “==”: 在操作中将类型“T”与类型“U”混合不安全
+#endif
 // clang-format off
 DEFINE_CHECK_OP_IMPL(EQ, ==)
 DEFINE_CHECK_OP_IMPL(NE, !=)
@@ -202,6 +205,10 @@ DEFINE_CHECK_OP_IMPL(GT, > )
 #define CHECK_GE(val1, val2) CHECK_OP(GE, >=, val1, val2)
 #define CHECK_GT(val1, val2) CHECK_OP(GT, > , val1, val2)
 // clang-format on
+
+#ifdef _MSC_VER
+#pragma warning(default:4805)
+#endif
 
 #if DCHECK_IS_ON()
 

@@ -1,0 +1,87 @@
+# Copyright 2017 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//media/media_options.gni")
+
+source_set("video") {
+  # Do not expand the visibility here without double-checking with OWNERS, this
+  # is a roll-up target which is part of the //media component. Most other DEPs
+  # should be using //media and not directly DEP this roll-up target.
+  visibility = [
+    "//media",
+    "//media/filters",
+    "//media/formats",
+    "//media/renderers",
+  ]
+
+  sources = [
+    "gpu_memory_buffer_video_frame_pool.cc",
+    "gpu_memory_buffer_video_frame_pool.h",
+    "gpu_video_accelerator_factories.cc",
+    "gpu_video_accelerator_factories.h",
+    "h264_bit_reader.cc",
+    "h264_bit_reader.h",
+    "h264_level_limits.cc",
+    "h264_level_limits.h",
+    "h264_parser.cc",
+    "h264_parser.h",
+    "h264_poc.cc",
+    "h264_poc.h",
+    "half_float_maker.cc",
+    "half_float_maker.h",
+    "picture.cc",
+    "picture.h",
+    "trace_util.cc",
+    "trace_util.h",
+    "video_decode_accelerator.cc",
+    "video_decode_accelerator.h",
+    "video_encode_accelerator.cc",
+    "video_encode_accelerator.h",
+    "video_encode_accelerator_adapter.cc",
+    "video_encode_accelerator_adapter.h",
+    "video_encoder_info.cc",
+    "video_encoder_info.h",
+  ]
+
+  if (proprietary_codecs && enable_platform_hevc) {
+    sources += [
+      "h265_parser.cc",
+      "h265_parser.h",
+    ]
+  }
+
+  public_deps = [ "//gpu/command_buffer/client:gles2_interface" ]
+
+  deps = [
+    "//build:chromeos_buildflags",
+    "//gpu/command_buffer/client",
+    "//gpu/command_buffer/common",
+    "//media/base",
+    "//third_party/libyuv",
+    "//ui/gfx",
+    "//ui/gl",
+  ]
+
+  configs += [
+    # TODO(crbug.com/167187): Fix size_t to int truncations.
+    "//build/config/compiler:no_size_t_to_int_warning",
+    "//media:subcomponent_config",
+  ]
+
+  if (media_use_libvpx) {
+    sources += [
+      "vpx_video_encoder.cc",
+      "vpx_video_encoder.h",
+    ]
+    deps += [ "//third_party/libvpx" ]
+  }
+
+  if (proprietary_codecs && media_use_openh264) {
+    sources += [
+      "openh264_video_encoder.cc",
+      "openh264_video_encoder.h",
+    ]
+    deps += [ "//third_party/openh264:encoder" ]
+  }
+}

@@ -1,0 +1,26 @@
+# Copyright (c) 2018 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//testing/libfuzzer/fuzzer_test.gni")
+
+group("fuzzers") {
+}
+
+# Build Skia fuzzers from OSS-Fuzz on Windows since Windows is not supported by
+# OSS-Fuzz.
+if (is_win && use_libfuzzer) {
+  static_library("skia_encoder_fuzzer_lib") {
+    sources = [ "//third_party/skia/fuzz/FuzzEncoders.cpp" ]
+    configs += [ "//skia:skia_library_config" ]
+    deps = [ "//skia" ]
+  }
+
+  config("skia_test_fonts_includes_config") {
+    include_dirs = [
+      "//third_party/skia/tools/fonts",
+      "//third_party/skia/tools/",
+    ]
+  }
+
+}

@@ -5,7 +5,7 @@
 import("//mojo/public/tools/bindings/mojom.gni")
 
 mojom("url_mojom_gurl") {
-  generate_java = true
+  generate_java = false
   sources = [ "url.mojom" ]
 
   cpp_typemaps = [
@@ -86,15 +86,6 @@ mojom("url_mojom_origin") {
   ]
 
   webui_module_path = "chrome://resources/mojo/url/mojom"
-}
-
-mojom("test_url_mojom_gurl") {
-  sources = [ "url_test.mojom" ]
-
-  public_deps = [
-    ":url_mojom_gurl",
-    ":url_mojom_origin",
-  ]
 }
 
 component("mojom_traits") {
