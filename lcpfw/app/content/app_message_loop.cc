@@ -29,7 +29,7 @@
 //#include "skia/ext/skia_memory_dump_provider.h"
 //#include "sql/sql_memory_dump_provider.h"
 //
-//#include "ui/base/clipboard/clipboard.h"
+#include "ui/base/clipboard/clipboard.h"
 //#include "ui/display/display_features.h"
 //#include "ui/gfx/font_render_params.h"
 //#include "ui/gfx/switches.h"
@@ -46,12 +46,6 @@
 //
 //#include "net/base/winsock_init.h"
 //#include "ui/base/l10n/l10n_util_win.h"
-//#endif
-//
-//#if defined(OS_WIN)
-//#include "media/device_monitors/system_message_window_win.h"
-//#elif defined(OS_MAC)
-//#include "media/device_monitors/device_monitor_mac.h"
 //#endif
 
 #include "base/metrics/histogram_macros.h"
@@ -108,7 +102,7 @@ AppMainLoop::~AppMainLoop()
 {
     DCHECK_EQ(this, g_current_app_main_loop);
 
-    //ui::Clipboard::DestroyClipboardForCurrentThread();
+    ui::Clipboard::DestroyClipboardForCurrentThread();
 
     g_current_app_main_loop = nullptr;
 }
@@ -197,15 +191,15 @@ bool AppMainLoop::InitializeToolkit()
     // (Need to add InitializeToolkit stage to BrowserParts).
     // See also GTK setup in EarlyInitialization, above, and associated comments.
 
-  //#ifdef OS_WIN
-  //    INITCOMMONCONTROLSEX config;
-  //    config.dwSize = sizeof(config);
-  //    config.dwICC = ICC_WIN95_CLASSES;
-  //    if (!InitCommonControlsEx(&config))
-  //    {
-  //        PLOG(FATAL);
-  //    }
-  //#endif
+    //#ifdef OS_WIN
+    //    INITCOMMONCONTROLSEX config;
+    //    config.dwSize = sizeof(config);
+    //    config.dwICC = ICC_WIN95_CLASSES;
+    //    if (!InitCommonControlsEx(&config))
+    //    {
+    //        PLOG(FATAL);
+    //    }
+    //#endif
 
     if (parts_)
     {
@@ -237,6 +231,19 @@ void AppMainLoop::MainMessageLoopStart()
     //TRACE_EVENT0("startup", "AppMainLoop::MainMessageLoopStart");
     DCHECK(base::CurrentUIThread::IsSet());
     InitializeMainThread();
+}
+
+void AppMainLoop::InitializeMainThread()
+{
+    const char* kThreadName = "LcpfwMainThread";
+    base::PlatformThread::SetName(kThreadName);
+
+    // 主线程实例不用Start*，但需要为其指定ThreadTaskRunner
+    // Register the main thread. The main thread's task runner should already have
+    // been initialized in MainMessageLoopStart() (or before if
+    // CurrentThread::Get() was externally provided).
+    DCHECK(base::ThreadTaskRunnerHandle::IsSet());
+    main_thread_.reset(new AppThread(AppThread::UI, kThreadName, base::ThreadTaskRunnerHandle::Get()));
 }
 
 void AppMainLoop::PostMainMessageLoopStart()
@@ -279,28 +286,6 @@ void AppMainLoop::PostMainMessageLoopStart()
     //    sql::SqlMemoryDumpProvider::GetInstance(), "Sql", nullptr);
 }
 
-int AppMainLoop::PreCreateThreads()
-{
-    if (parts_)
-    {
-        result_code_ = parts_->PreCreateThreads();
-    }
-
-#if defined(OS_MAC)
-    // The WindowResizeHelper allows the UI thread to wait on specific renderer
-    // and GPU messages from the IO thread. Initializing it before the IO thread
-    // starts ensures the affected IO thread messages always have somewhere to go.
-    ui::WindowResizeHelperMac::Get()->Init(base::ThreadTaskRunnerHandle::Get());
-#endif
-
-    return result_code_;
-}
-
-void AppMainLoop::PreShutdown()
-{
-    // ui::Clipboard::OnPreShutdownForCurrentThread();
-}
-
 void AppMainLoop::CreateStartupTasks()
 {
     DCHECK(!startup_task_runner_);
@@ -330,15 +315,21 @@ void AppMainLoop::CreateStartupTasks()
     startup_task_runner_->RunAllTasksNow();
 }
 
-scoped_refptr<base::SingleThreadTaskRunner> AppMainLoop::GetResizeTaskRunner() {
+int AppMainLoop::PreCreateThreads()
+{
+    if (parts_)
+    {
+        result_code_ = parts_->PreCreateThreads();
+    }
+
 #if defined(OS_MAC)
-    scoped_refptr<base::SingleThreadTaskRunner> task_runner =
-        ui::WindowResizeHelperMac::Get()->task_runner();
-    // In tests, WindowResizeHelperMac task runner might not be initialized.
-    return task_runner ? task_runner : base::ThreadTaskRunnerHandle::Get();
-#else
-    return base::ThreadTaskRunnerHandle::Get();
+    // The WindowResizeHelper allows the UI thread to wait on specific renderer
+    // and GPU messages from the IO thread. Initializing it before the IO thread
+    // starts ensures the affected IO thread messages always have somewhere to go.
+    ui::WindowResizeHelperMac::Get()->Init(base::ThreadTaskRunnerHandle::Get());
 #endif
+
+    return result_code_;
 }
 
 void testTimeout()
@@ -425,10 +416,10 @@ int AppMainLoop::CreateThreads()
     ui_message_loop_options.message_pump_type = base::MessagePumpType::UI;
 
     for (size_t thread_id = AppThread::UI + 1;
-         thread_id < AppThread::ID_COUNT;
-         ++thread_id)
+        thread_id < AppThread::ID_COUNT;
+        ++thread_id)
     {
-        base::Thread::Options *options = &default_options;
+        base::Thread::Options* options = &default_options;
         bool require_create = true;
 
         switch (thread_id)
@@ -451,7 +442,7 @@ int AppMainLoop::CreateThreads()
         }
     }
 
-    lcpfw::PostTask(FROM_HERE, 
+    lcpfw::PostTask(FROM_HERE,
         base::BindOnce([](AppMainLoop* main_loop) {
             // Enable main thread and thread pool best effort queues. Non-best
             // effort queues will already have been enabled. This will enable
@@ -459,26 +450,55 @@ int AppMainLoop::CreateThreads()
             // the threads have been created, i.e. here.
             //content::BrowserTaskExecutor::EnableAllQueues();
             main_loop->scoped_best_effort_execution_fence_.reset();
-        },
-        // Main thread tasks can't run after BrowserMainLoop destruction.
-        // Accessing an Unretained pointer to BrowserMainLoop from a main
-        // thread task is therefore safe.
-            base::Unretained(this)));
+            },
+            // Main thread tasks can't run after BrowserMainLoop destruction.
+            // Accessing an Unretained pointer to BrowserMainLoop from a main
+            // thread task is therefore safe.
+                base::Unretained(this)));
     // test
     //lcpfw::PostTask(FROM_HERE, base::BindOnce(testTimeout));
     //lcpfw::PostDelayedTask(FROM_HERE, base::BindOnce(testTimeout), base::TimeDelta::FromSeconds(1500));
-    base::PostTask(FROM_HERE, base::TaskTraits({ base::ThreadPool(), base::MayBlock() }), base::BindOnce(testTimeout));
-    base::PostDelayedTask(FROM_HERE, base::TaskTraits({ base::ThreadPool(), base::MayBlock() }), base::BindOnce(testTimeout), base::TimeDelta::FromSeconds(1500));
+    //base::PostTask(FROM_HERE, base::TaskTraits({ base::ThreadPool(), base::MayBlock() }), base::BindOnce(testTimeout));
+    //base::PostDelayedTask(FROM_HERE, base::TaskTraits({ base::ThreadPool(), base::MayBlock() }), base::BindOnce(testTimeout), base::TimeDelta::FromSeconds(1500));
 
     created_threads_ = true;
     return result_code_;
 }
 
-int AppMainLoop::PostCreateThreads() {
-    if (parts_) {
+int AppMainLoop::PostCreateThreads()
+{
+    if (parts_)
+    {
         //TRACE_EVENT0("startup", "AppMainLoop::PostCreateThreads");
         parts_->PostCreateThreads();
     }
+
+    return result_code_;
+}
+
+int AppMainLoop::AppThreadsStarted()
+{
+    //content::HistogramSynchronizer::GetInstance();
+
+//    // Alert the clipboard class to which threads are allowed to access the clipboard:
+//    std::vector<base::PlatformThreadId> allowed_clipboard_threads;
+//    // The current thread is the UI thread.
+//    allowed_clipboard_threads.push_back(base::PlatformThread::CurrentId());
+//#if defined(OS_WIN)
+//    // On Windows, clipboard is also used on the IO thread.
+//    for (auto& iter : worker_threads_)
+//    {
+//        if (iter.get())
+//        {
+//            allowed_clipboard_threads.push_back(iter->GetThreadId());
+//        }
+//    }
+//#endif
+//    ui::Clipboard::SetAllowedThreads(allowed_clipboard_threads);
+
+#if defined(OS_MAC)
+    // ThemeHelperMac::GetInstance();
+#endif  // defined(OS_MAC)
 
     return result_code_;
 }
@@ -516,6 +536,22 @@ void AppMainLoop::RunMainMessageLoopParts()
     {
         MainMessageLoopRun();
     }
+}
+
+void AppMainLoop::MainMessageLoopRun()
+{
+    base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
+    parts_->PreDefaultMainMessageLoopRun(run_loop.QuitClosure());
+
+    // test
+    lcpfw::PostDelayedTask(FROM_HERE, run_loop.QuitClosure(), base::TimeDelta::FromSeconds(5));
+
+    run_loop.Run();
+}
+
+void AppMainLoop::PreShutdown()
+{
+    ui::Clipboard::OnPreShutdownForCurrentThread();
 }
 
 void AppMainLoop::ShutdownThreadsAndCleanUp()
@@ -565,52 +601,14 @@ void AppMainLoop::ShutdownThreadsAndCleanUp()
     }
 }
 
-void AppMainLoop::InitializeMainThread()
+scoped_refptr<base::SingleThreadTaskRunner> AppMainLoop::GetResizeTaskRunner()
 {
-    const char *kThreadName = "LcpfwMainThread";
-    base::PlatformThread::SetName(kThreadName);
-
-    // 主线程实例不用Start*，但需要为其指定ThreadTaskRunner
-    // Register the main thread. The main thread's task runner should already have
-    // been initialized in MainMessageLoopStart() (or before if
-    // CurrentThread::Get() was externally provided).
-    DCHECK(base::ThreadTaskRunnerHandle::IsSet());
-    main_thread_.reset(new AppThread(AppThread::UI, kThreadName, base::ThreadTaskRunnerHandle::Get()));
-}
-
-int AppMainLoop::AppThreadsStarted()
-{
-    //content::HistogramSynchronizer::GetInstance();
-
-//    // Alert the clipboard class to which threads are allowed to access the clipboard:
-//    std::vector<base::PlatformThreadId> allowed_clipboard_threads;
-//    // The current thread is the UI thread.
-//    allowed_clipboard_threads.push_back(base::PlatformThread::CurrentId());
-//#if defined(OS_WIN)
-//    // On Windows, clipboard is also used on the IO thread.
-//    for (auto& iter : worker_threads_)
-//    {
-//        if (iter.get())
-//        {
-//            allowed_clipboard_threads.push_back(iter->GetThreadId());
-//        }
-//    }
-//#endif
-//    ui::Clipboard::SetAllowedThreads(allowed_clipboard_threads);
-
 #if defined(OS_MAC)
-    // ThemeHelperMac::GetInstance();
-#endif  // defined(OS_MAC)
-
-    return result_code_;
-}
-
-void AppMainLoop::MainMessageLoopRun()
-{
-    base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
-    parts_->PreDefaultMainMessageLoopRun(run_loop.QuitClosure());
-
-    lcpfw::PostDelayedTask(FROM_HERE, run_loop.QuitClosure(), base::TimeDelta::FromSeconds(5));
-
-    run_loop.Run();
+    scoped_refptr<base::SingleThreadTaskRunner> task_runner =
+        ui::WindowResizeHelperMac::Get()->task_runner();
+    // In tests, WindowResizeHelperMac task runner might not be initialized.
+    return task_runner ? task_runner : base::ThreadTaskRunnerHandle::Get();
+#else
+    return base::ThreadTaskRunnerHandle::Get();
+#endif
 }

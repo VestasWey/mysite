@@ -10,8 +10,8 @@ viz_component("host") {
   defines = [ "VIZ_HOST_IMPLEMENTATION" ]
 
   sources = [
-    "client_frame_sink_video_capturer.cc",
-    "client_frame_sink_video_capturer.h",
+    #"client_frame_sink_video_capturer.cc",
+    #"client_frame_sink_video_capturer.h",
     "compositing_mode_reporter_impl.cc",
     "compositing_mode_reporter_impl.h",
     "gpu_client.cc",
@@ -68,49 +68,4 @@ viz_component("host") {
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
-}
-
-viz_source_set("unit_tests") {
-  testonly = true
-
-  sources = [
-    "hit_test/hit_test_query_unittest.cc",
-    "host_frame_sink_manager_unittest.cc",
-    "host_gpu_memory_buffer_manager_unittest.cc",
-  ]
-
-  deps = [
-    ":host",
-    "//base",
-    "//base/test:test_support",
-    "//build:chromeos_buildflags",
-    "//components/viz/test:test_support",
-    "//gpu",
-    "//gpu/ipc/host",
-    "//mojo/public/cpp/bindings",
-    "//services/viz/privileged/mojom",
-    "//services/viz/public/mojom",
-    "//testing/gmock",
-    "//testing/gtest",
-  ]
-
-  if (use_ozone) {
-    deps += [ "//ui/ozone" ]
-  }
-
-  if (use_x11 || use_ozone) {
-    deps += [ "//ui/base:features" ]
-  }
-}
-
-fuzzer_test("hit_test_query_fuzzer") {
-  sources = [ "hit_test/hit_test_query_fuzzer.cc" ]
-
-  libfuzzer_options = [ "max_len=4096" ]
-
-  deps = [
-    ":host",
-    "//base/test:test_support",
-    "//components/viz/test:test_support",
-  ]
 }

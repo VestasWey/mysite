@@ -56,14 +56,16 @@ namespace lcpfw
         // 启用冗长日志记录，以便启用base::Histogram数据统计在日志里输出。
         // 也可以选择不在通用日志里输出，在程序合适的地方用base::StatisticsRecorder::ToJSON/WriteGraph()
         // 来获取数据后再自行输出到指定文件也可以。
+#if _DEBUG
         if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kV))
         {
             base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(switches::kV, "2");
         }
+#endif
 
         logging::InitLogging(logging_settings);
         logging::SetLogItems(
-            false,    // enable_process_id
+            true,     // enable_process_id
             true,     // enable_thread_id
             true,     // enable_timestamp
             false);   // enable_tickcount

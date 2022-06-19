@@ -674,10 +674,9 @@ class RasterDecoderImpl final : public RasterDecoder,
     // Always flush the surface even if source_scoped_access.success() is
     // false, so the begin_semaphores can be released, and end_semaphores can
     // be signalled.
-    GrFlushInfo flush_info = {
-        .fNumSemaphores = signal_semaphores.size(),
-        .fSignalSemaphores = signal_semaphores.data(),
-    };
+    GrFlushInfo flush_info = { 0 };
+    flush_info.fNumSemaphores = (int)signal_semaphores.size();
+    flush_info.fSignalSemaphores = signal_semaphores.data();
     gpu::AddVulkanCleanupTaskForSkiaFlush(
         shared_context_state_->vk_context_provider(), &flush_info);
 
@@ -1016,10 +1015,9 @@ void RasterDecoderImpl::Destroy(bool have_context) {
 
     // Make sure we flush any pending skia work on this context.
     if (sk_surface_) {
-      GrFlushInfo flush_info = {
-          .fNumSemaphores = end_semaphores_.size(),
-          .fSignalSemaphores = end_semaphores_.data(),
-      };
+      GrFlushInfo flush_info = { 0 };
+      flush_info.fNumSemaphores = (int)end_semaphores_.size();
+      flush_info.fSignalSemaphores = end_semaphores_.data();
       AddVulkanCleanupTaskForSkiaFlush(
           shared_context_state_->vk_context_provider(), &flush_info);
       auto result = sk_surface_->flush(flush_info);

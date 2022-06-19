@@ -322,7 +322,7 @@ MenuItemView* MenuItemView::AddMenuItemAt(
   DCHECK_GE(index, 0);
   if (!submenu_)
     CreateSubmenu();
-  DCHECK_LE(size_t{index}, submenu_->children().size());
+  DCHECK_LE(size_t{(size_t)index}, submenu_->children().size());
   if (type == Type::kSeparator) {
     submenu_->AddChildViewAt(std::make_unique<MenuSeparator>(separator_style),
                              index);
@@ -402,7 +402,7 @@ MenuItemView* MenuItemView::AppendMenuItemImpl(int item_id,
                                                const base::string16& label,
                                                const gfx::ImageSkia& icon,
                                                Type type) {
-  const int index = submenu_ ? int{submenu_->children().size()} : 0;
+  const int index = submenu_ ? int{ (int)submenu_->children().size()} : 0;
   return AddMenuItemAt(index, item_id, label, base::string16(),
                        base::string16(), ui::ThemedVectorIcon(), icon,
                        ui::ThemedVectorIcon(), type, ui::NORMAL_SEPARATOR);
@@ -1420,7 +1420,7 @@ gfx::Insets MenuItemView::GetContainerMargins() const {
 }
 
 int MenuItemView::NonIconChildViewsCount() const {
-  return int{children().size()} - (icon_view_ ? 1 : 0) -
+  return int{(int)children().size()} - (icon_view_ ? 1 : 0) -
          (radio_check_image_view_ ? 1 : 0) -
          (submenu_arrow_image_view_ ? 1 : 0) - (vertical_separator_ ? 1 : 0);
 }

@@ -163,6 +163,7 @@ template("proto_library") {
   } else {
     generate_javascript = false
   }
+  generate_javascript = false
 
   if (defined(invoker.generate_descriptor)) {
     generate_descriptor = invoker.generate_descriptor

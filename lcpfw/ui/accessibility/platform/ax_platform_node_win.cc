@@ -1708,7 +1708,7 @@ IFACEMETHODIMP AXPlatformNodeWin::setSelectionRanges(LONG nRanges,
     return E_INVALIDARG;
 
   if (anchor_node->IsLeaf()) {
-    if (size_t{ranges->anchorOffset} > anchor_node->GetHypertext().length()) {
+    if ((size_t)ranges->anchorOffset > anchor_node->GetHypertext().length()) {
       return E_INVALIDARG;
     }
   } else {
@@ -1717,7 +1717,7 @@ IFACEMETHODIMP AXPlatformNodeWin::setSelectionRanges(LONG nRanges,
   }
 
   if (focus_node->IsLeaf()) {
-    if (size_t{ranges->activeOffset} > focus_node->GetHypertext().length())
+    if ((size_t)ranges->activeOffset > focus_node->GetHypertext().length())
       return E_INVALIDARG;
   } else {
     if (ranges->activeOffset > focus_node->GetChildCount())
@@ -3241,7 +3241,7 @@ IFACEMETHODIMP AXPlatformNodeWin::get_columnHeaderCells(
     }
   }
 
-  *n_column_header_cells = LONG{column_header_ids.size()};
+  *n_column_header_cells = (LONG)column_header_ids.size();
   return S_OK;
 }
 
@@ -3294,7 +3294,7 @@ IFACEMETHODIMP AXPlatformNodeWin::get_rowHeaderCells(
     }
   }
 
-  *n_row_header_cells = LONG{row_header_ids.size()};
+  *n_row_header_cells = (LONG)row_header_ids.size();
   return S_OK;
 }
 
@@ -5083,7 +5083,7 @@ AXPlatformNodeWin::GetMarkerTypeFromRange(
   if (!start_offset && contiguous_range->first > 0)
     return MarkerTypeRangeResult::kMixed;
   // 2. The |end_offset| is not specified, treat it as max text offset.
-  if (!end_offset && size_t{contiguous_range->second} < GetHypertext().length())
+  if (!end_offset && (size_t)contiguous_range->second < GetHypertext().length())
     return MarkerTypeRangeResult::kMixed;
   // 3. The |start_offset| is specified, but is before the first matching range.
   if (start_offset && start_offset.value() < contiguous_range->first)

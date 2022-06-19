@@ -16,7 +16,7 @@
 #include "url/gurl.h"
 
 namespace ukm {
-class UkmRecorder;
+//class UkmRecorder;
 }  // namespace ukm
 
 namespace cc {
@@ -27,13 +27,13 @@ class CC_EXPORT UkmRecorderFactory {
  public:
   virtual ~UkmRecorderFactory() {}
 
-  virtual std::unique_ptr<ukm::UkmRecorder> CreateRecorder() = 0;
+  //virtual std::unique_ptr<ukm::UkmRecorder> CreateRecorder() = 0;
 };
 
 // TODO(xidachen): rename the class to CompositorUkmManager.
 class CC_EXPORT UkmManager {
  public:
-  explicit UkmManager(std::unique_ptr<ukm::UkmRecorder> recorder);
+  explicit UkmManager(/*std::unique_ptr<ukm::UkmRecorder> recorder*/);
   ~UkmManager();
 
   void SetSourceId(ukm::SourceId source_id);
@@ -69,7 +69,7 @@ class CC_EXPORT UkmManager {
       const CompositorFrameReporter::ProcessedVizBreakdown&
           processed_viz_breakdown) const;
 
-  ukm::UkmRecorder* recorder_for_testing() { return recorder_.get(); }
+  //ukm::UkmRecorder* recorder_for_testing() { return recorder_.get(); }
 
  private:
   void RecordCheckerboardUkm();
@@ -85,7 +85,7 @@ class CC_EXPORT UkmManager {
   int total_num_of_checkerboarded_images_ = 0;
 
   ukm::SourceId source_id_ = ukm::kInvalidSourceId;
-  std::unique_ptr<ukm::UkmRecorder> recorder_;
+  //std::unique_ptr<ukm::UkmRecorder> recorder_;
 };
 
 }  // namespace cc

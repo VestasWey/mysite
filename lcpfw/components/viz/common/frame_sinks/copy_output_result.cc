@@ -6,7 +6,7 @@
 
 #include "base/check_op.h"
 #include "base/notreached.h"
-#include "third_party/libyuv/include/libyuv.h"
+//#include "third_party/libyuv/include/libyuv.h"
 #include "ui/gfx/color_space.h"
 
 namespace viz {
@@ -60,22 +60,27 @@ bool CopyOutputResult::ReadI420Planes(uint8_t* y_out,
   const SkBitmap& bitmap = AsSkBitmap();
   if (!bitmap.readyToDraw())
     return false;
-  const uint8_t* pixels = static_cast<uint8_t*>(bitmap.getPixels());
+  //const uint8_t* pixels = static_cast<uint8_t*>(bitmap.getPixels());
   // The conversion below ignores color space completely, and it's not even
   // sRGB→Rec.709. Unfortunately, hand-optimized routines are not available, and
   // a perfect conversion using gfx::ColorTransform would execute way too
   // slowly. See SoftwareRenderer for related comments on its lack of color
   // space management (due to performance concerns).
-  if (bitmap.colorType() == kBGRA_8888_SkColorType) {
-    return 0 == libyuv::ARGBToI420(pixels, bitmap.rowBytes(), y_out,
+  if (bitmap.colorType() == kBGRA_8888_SkColorType)
+  {
+      NOTIMPLEMENTED();
+    /*return 0 == libyuv::ARGBToI420(pixels, bitmap.rowBytes(), y_out,
                                    y_out_stride, u_out, u_out_stride, v_out,
                                    v_out_stride, bitmap.width(),
-                                   bitmap.height());
-  } else if (bitmap.colorType() == kRGBA_8888_SkColorType) {
-    return 0 == libyuv::ABGRToI420(pixels, bitmap.rowBytes(), y_out,
+                                   bitmap.height());*/
+  }
+  else if (bitmap.colorType() == kRGBA_8888_SkColorType)
+  {
+      NOTIMPLEMENTED();
+    /*return 0 == libyuv::ABGRToI420(pixels, bitmap.rowBytes(), y_out,
                                    y_out_stride, u_out, u_out_stride, v_out,
                                    v_out_stride, bitmap.width(),
-                                   bitmap.height());
+                                   bitmap.height());*/
   }
 
   // Other SkBitmap color types could be supported, but are currently never

@@ -1,0 +1,22 @@
+# Copyright 2019 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/protobuf/proto_library.gni")
+
+static_library("sqlite_proto") {
+  sources = [
+    "key_value_data.h",
+    "key_value_table.cc",
+    "key_value_table.h",
+    "proto_table_manager.cc",
+    "proto_table_manager.h",
+    "table_manager.cc",
+    "table_manager.h",
+  ]
+  deps = [
+    "//base",
+    "//sql",
+    "//third_party/protobuf:protobuf_lite",
+  ]
+}

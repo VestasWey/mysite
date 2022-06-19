@@ -178,14 +178,14 @@ void GpuClient::CreateJpegDecodeAccelerator(
 }
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 
-void GpuClient::CreateVideoEncodeAcceleratorProvider(
-    mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
-        vea_provider_receiver) {
-  if (auto* gpu_host = delegate_->EnsureGpuHost()) {
-    gpu_host->gpu_service()->CreateVideoEncodeAcceleratorProvider(
-        std::move(vea_provider_receiver));
-  }
-}
+//void GpuClient::CreateVideoEncodeAcceleratorProvider(
+//    mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
+//        vea_provider_receiver) {
+//  if (auto* gpu_host = delegate_->EnsureGpuHost()) {
+//    gpu_host->gpu_service()->CreateVideoEncodeAcceleratorProvider(
+//        std::move(vea_provider_receiver));
+//  }
+//}
 
 void GpuClient::CreateGpuMemoryBuffer(
     gfx::GpuMemoryBufferId id,

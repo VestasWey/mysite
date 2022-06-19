@@ -11,6 +11,11 @@
 #include "common/profiles/profile.h"
 
 
+class StatusTray;
+class BackgroundModeManager;
+class MainModule;
+class CommandController;
+
 class AppMainProcess
 {
 public:
@@ -32,6 +37,7 @@ public:
     // are correct here).
     virtual const std::string& GetApplicationLocale() = 0;
     virtual void SetApplicationLocale(const std::string& actual_locale) = 0;
+    virtual BackgroundModeManager* background_mode_manager() = 0;
 
     virtual Profile* global_profile() = 0;
     virtual Profile* profile() = 0;
@@ -41,7 +47,10 @@ public:
     // Returns the StatusTray, which provides an API for displaying status icons
     // in the system status tray. Returns NULL if status icons are not supported
     // on this platform (or this is a unit test).
-    //virtual StatusTray* status_tray() = 0;
+    virtual StatusTray* status_tray() = 0;
+
+    virtual scoped_refptr<MainModule> main_module() = 0;
+    virtual CommandController* command_controller() = 0;
 
 protected:
     AppMainProcess() = default;

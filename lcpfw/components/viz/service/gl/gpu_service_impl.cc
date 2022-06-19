@@ -46,12 +46,12 @@
 #include "ipc/ipc_channel_handle.h"
 #include "ipc/ipc_sync_channel.h"
 #include "ipc/ipc_sync_message_filter.h"
-#include "media/gpu/buildflags.h"
-#include "media/gpu/gpu_video_accelerator_util.h"
-#include "media/gpu/gpu_video_encode_accelerator_factory.h"
-#include "media/gpu/ipc/service/gpu_video_decode_accelerator.h"
-#include "media/gpu/ipc/service/media_gpu_channel_manager.h"
-#include "media/mojo/services/mojo_video_encode_accelerator_provider.h"
+//#include "media/gpu/buildflags.h"
+//#include "media/gpu/gpu_video_accelerator_util.h"
+//#include "media/gpu/gpu_video_encode_accelerator_factory.h"
+//#include "media/gpu/ipc/service/gpu_video_decode_accelerator.h"
+//#include "media/gpu/ipc/service/media_gpu_channel_manager.h"
+//#include "media/mojo/services/mojo_video_encode_accelerator_provider.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "skia/buildflags.h"
 #include "third_party/skia/include/gpu/GrDirectContext.h"
@@ -66,9 +66,9 @@
 #include "ui/gl/init/gl_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(USE_VAAPI)
-#include "media/gpu/vaapi/vaapi_image_decode_accelerator_worker.h"
-#endif  // BUILDFLAG(USE_VAAPI)
+//#if BUILDFLAG(USE_VAAPI)
+//#include "media/gpu/vaapi/vaapi_image_decode_accelerator_worker.h"
+//#endif  // BUILDFLAG(USE_VAAPI)
 
 #if defined(OS_ANDROID)
 #include "components/viz/service/gl/throw_uncaught_exception.h"
@@ -289,13 +289,14 @@ void GetVideoCapabilities(const gpu::GpuPreferences& gpu_preferences,
   // Note: Since Android doesn't have to support PPAPI/Flash, we have not
   // returned the decoder profiles here since https://crrev.com/665999.
 #else
-  gpu_info->video_decode_accelerator_capabilities =
+  /*gpu_info->video_decode_accelerator_capabilities =
       media::GpuVideoDecodeAccelerator::GetCapabilities(gpu_preferences,
                                                         gpu_workarounds);
   gpu_info->video_encode_accelerator_supported_profiles =
       media::GpuVideoAcceleratorUtil::ConvertMediaToGpuEncodeProfiles(
           media::GpuVideoEncodeAcceleratorFactory::GetSupportedProfiles(
-              gpu_preferences, gpu_workarounds));
+              gpu_preferences, gpu_workarounds));*/
+    NOTREACHED();
 #endif
 }
 
@@ -396,10 +397,10 @@ GpuServiceImpl::GpuServiceImpl(
   }
 #endif
 
-#if BUILDFLAG(USE_VAAPI_IMAGE_CODECS)
-  image_decode_accelerator_worker_ =
-      media::VaapiImageDecodeAcceleratorWorker::Create();
-#endif  // BUILDFLAG(USE_VAAPI_IMAGE_CODECS)
+//#if BUILDFLAG(USE_VAAPI_IMAGE_CODECS)
+//  image_decode_accelerator_worker_ =
+//      media::VaapiImageDecodeAcceleratorWorker::Create();
+//#endif  // BUILDFLAG(USE_VAAPI_IMAGE_CODECS)
 
 #if defined(OS_APPLE)
   if (gpu_feature_info_.status_values[gpu::GPU_FEATURE_TYPE_METAL] ==
@@ -447,7 +448,7 @@ GpuServiceImpl::~GpuServiceImpl() {
   if (watchdog_thread_)
     watchdog_thread_->OnGpuProcessTearDown();
 
-  media_gpu_channel_manager_.reset();
+  //media_gpu_channel_manager_.reset();
   gpu_channel_manager_.reset();
 
   // Destroy |gpu_memory_buffer_factory_| on the IO thread since its weakptrs
@@ -578,8 +579,8 @@ void GpuServiceImpl::InitializeWithHost(
       image_decode_accelerator_worker_.get(), vulkan_context_provider(),
       metal_context_provider_.get(), dawn_context_provider());
 
-  media_gpu_channel_manager_.reset(
-      new media::MediaGpuChannelManager(gpu_channel_manager_.get()));
+  /*media_gpu_channel_manager_.reset(
+      new media::MediaGpuChannelManager(gpu_channel_manager_.get()));*/
   if (watchdog_thread())
     watchdog_thread()->AddPowerObserver();
 }
@@ -732,15 +733,15 @@ void GpuServiceImpl::CreateJpegEncodeAccelerator(
 }
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 
-void GpuServiceImpl::CreateVideoEncodeAcceleratorProvider(
-    mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
-        vea_provider_receiver) {
-  DCHECK(io_runner_->BelongsToCurrentThread());
-  media::MojoVideoEncodeAcceleratorProvider::Create(
-      std::move(vea_provider_receiver),
-      base::BindRepeating(&media::GpuVideoEncodeAcceleratorFactory::CreateVEA),
-      gpu_preferences_, gpu_channel_manager_->gpu_driver_bug_workarounds());
-}
+//void GpuServiceImpl::CreateVideoEncodeAcceleratorProvider(
+//    mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
+//        vea_provider_receiver) {
+//  DCHECK(io_runner_->BelongsToCurrentThread());
+//  media::MojoVideoEncodeAcceleratorProvider::Create(
+//      std::move(vea_provider_receiver),
+//      base::BindRepeating(&media::GpuVideoEncodeAcceleratorFactory::CreateVEA),
+//      gpu_preferences_, gpu_channel_manager_->gpu_driver_bug_workarounds());
+//}
 
 void GpuServiceImpl::CreateGpuMemoryBuffer(
     gfx::GpuMemoryBufferId id,
@@ -861,7 +862,7 @@ void GpuServiceImpl::DidCreateOffscreenContext(const GURL& active_url) {
 
 void GpuServiceImpl::DidDestroyChannel(int client_id) {
   DCHECK(main_runner_->BelongsToCurrentThread());
-  media_gpu_channel_manager_->RemoveChannel(client_id);
+  //media_gpu_channel_manager_->RemoveChannel(client_id);
   gpu_host_->DidDestroyChannel(client_id);
 }
 
@@ -965,7 +966,7 @@ void GpuServiceImpl::EstablishGpuChannel(int32_t client_id,
   mojo::MessagePipe pipe;
   gpu_channel->Init(pipe.handle0.release(), shutdown_event_);
 
-  media_gpu_channel_manager_->AddChannel(client_id);
+  //media_gpu_channel_manager_->AddChannel(client_id);
 
   std::move(callback).Run(std::move(pipe.handle1));
 }

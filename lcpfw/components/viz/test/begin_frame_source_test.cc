@@ -34,7 +34,7 @@ const BeginFrameArgs MockBeginFrameObserver::kDefaultBeginFrameArgs =
 #ifdef NDEBUG
         nullptr,
 #else
-        FROM_HERE,
+        {}/*FROM_HERE*/,
 #endif
         BeginFrameArgs::kManualSourceId,
         BeginFrameArgs::kStartingFrameNumber,

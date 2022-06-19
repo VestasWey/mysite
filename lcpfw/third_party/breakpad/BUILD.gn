@@ -277,94 +277,94 @@ if (!is_win) {
 # Mac --------------------------------------------------------------------------
 
 if (is_mac) {
-  if (current_toolchain == host_toolchain) {
-    executable("dump_syms") {
-      sources = [
-        "breakpad/src/common/dwarf/bytereader.cc",
-        "breakpad/src/common/dwarf/dwarf2diehandler.cc",
-        "breakpad/src/common/dwarf/dwarf2reader.cc",
-        "breakpad/src/common/dwarf/elf_reader.cc",
-        "breakpad/src/common/dwarf/elf_reader.h",
-        "breakpad/src/common/dwarf_cfi_to_module.cc",
-        "breakpad/src/common/dwarf_cu_to_module.cc",
-        "breakpad/src/common/dwarf_line_to_module.cc",
-        "breakpad/src/common/dwarf_range_list_handler.cc",
-        "breakpad/src/common/dwarf_range_list_handler.h",
-        "breakpad/src/common/language.cc",
-        "breakpad/src/common/mac/arch_utilities.cc",
-        "breakpad/src/common/mac/arch_utilities.h",
-        "breakpad/src/common/mac/dump_syms.cc",
-        "breakpad/src/common/mac/file_id.cc",
-        "breakpad/src/common/mac/macho_id.cc",
-        "breakpad/src/common/mac/macho_reader.cc",
-        "breakpad/src/common/mac/macho_utilities.cc",
-        "breakpad/src/common/mac/macho_walker.cc",
-        "breakpad/src/common/md5.cc",
-        "breakpad/src/common/memory_range.h",
-        "breakpad/src/common/module.cc",
-        "breakpad/src/common/path_helper.cc",
-        "breakpad/src/common/path_helper.h",
-        "breakpad/src/common/scoped_ptr.h",
-        "breakpad/src/common/stabs_reader.cc",
-        "breakpad/src/common/stabs_to_module.cc",
-        "breakpad/src/tools/mac/dump_syms/dump_syms_tool.cc",
-      ]
+  # if (current_toolchain == host_toolchain) {
+  #   executable("dump_syms") {
+  #     sources = [
+  #       "breakpad/src/common/dwarf/bytereader.cc",
+  #       "breakpad/src/common/dwarf/dwarf2diehandler.cc",
+  #       "breakpad/src/common/dwarf/dwarf2reader.cc",
+  #       "breakpad/src/common/dwarf/elf_reader.cc",
+  #       "breakpad/src/common/dwarf/elf_reader.h",
+  #       "breakpad/src/common/dwarf_cfi_to_module.cc",
+  #       "breakpad/src/common/dwarf_cu_to_module.cc",
+  #       "breakpad/src/common/dwarf_line_to_module.cc",
+  #       "breakpad/src/common/dwarf_range_list_handler.cc",
+  #       "breakpad/src/common/dwarf_range_list_handler.h",
+  #       "breakpad/src/common/language.cc",
+  #       "breakpad/src/common/mac/arch_utilities.cc",
+  #       "breakpad/src/common/mac/arch_utilities.h",
+  #       "breakpad/src/common/mac/dump_syms.cc",
+  #       "breakpad/src/common/mac/file_id.cc",
+  #       "breakpad/src/common/mac/macho_id.cc",
+  #       "breakpad/src/common/mac/macho_reader.cc",
+  #       "breakpad/src/common/mac/macho_utilities.cc",
+  #       "breakpad/src/common/mac/macho_walker.cc",
+  #       "breakpad/src/common/md5.cc",
+  #       "breakpad/src/common/memory_range.h",
+  #       "breakpad/src/common/module.cc",
+  #       "breakpad/src/common/path_helper.cc",
+  #       "breakpad/src/common/path_helper.h",
+  #       "breakpad/src/common/scoped_ptr.h",
+  #       "breakpad/src/common/stabs_reader.cc",
+  #       "breakpad/src/common/stabs_to_module.cc",
+  #       "breakpad/src/tools/mac/dump_syms/dump_syms_tool.cc",
+  #     ]
 
-      # For breakpad/src/common/stabs_reader.h.
-      defines = [ "HAVE_MACH_O_NLIST_H" ]
-      include_dirs = [ "breakpad/src/common/mac" ]
+  #     # For breakpad/src/common/stabs_reader.h.
+  #     defines = [ "HAVE_MACH_O_NLIST_H" ]
+  #     include_dirs = [ "breakpad/src/common/mac" ]
 
-      # The DWARF utilities require -funsigned-char.
-      cflags = [ "-funsigned-char" ]
+  #     # The DWARF utilities require -funsigned-char.
+  #     cflags = [ "-funsigned-char" ]
 
-      configs += [ ":internal_config" ]
+  #     configs += [ ":internal_config" ]
 
-      configs -= [ "//build/config/compiler:chromium_code" ]
-      configs += [ "//build/config/compiler:no_chromium_code" ]
+  #     configs -= [ "//build/config/compiler:chromium_code" ]
+  #     configs += [ "//build/config/compiler:no_chromium_code" ]
 
-      # dwarf2reader.cc uses dynamic_cast.
-      configs -= [ "//build/config/compiler:no_rtti" ]
-      configs += [ "//build/config/compiler:rtti" ]
+  #     # dwarf2reader.cc uses dynamic_cast.
+  #     configs -= [ "//build/config/compiler:no_rtti" ]
+  #     configs += [ "//build/config/compiler:rtti" ]
 
-      frameworks = [ "Foundation.framework" ]
+  #     frameworks = [ "Foundation.framework" ]
 
-      if (!is_debug) {
-        # dump_syms crashes when built at -O1, -O2, and -O3.  It does
-        # not crash at -Os.  To play it safe, dump_syms is always built
-        # at -O0 until this can be sorted out.
-        # https://crbug.com/google-breakpad/329
-        configs -= [ "//build/config/compiler:default_optimization" ]
-        cflags += [ "-O0" ]
-      }
-    }
+  #     if (!is_debug) {
+  #       # dump_syms crashes when built at -O1, -O2, and -O3.  It does
+  #       # not crash at -Os.  To play it safe, dump_syms is always built
+  #       # at -O0 until this can be sorted out.
+  #       # https://crbug.com/google-breakpad/329
+  #       configs -= [ "//build/config/compiler:default_optimization" ]
+  #       cflags += [ "-O0" ]
+  #     }
+  #   }
 
-    executable("symupload") {
-      sources = [
-        "breakpad/src/common/mac/HTTPGetRequest.m",
-        "breakpad/src/common/mac/HTTPMultipartUpload.m",
-        "breakpad/src/common/mac/HTTPPutRequest.m",
-        "breakpad/src/common/mac/HTTPRequest.m",
-        "breakpad/src/common/mac/HTTPSimplePostRequest.m",
-        "breakpad/src/common/mac/SymbolCollectorClient.m",
-        "breakpad/src/common/mac/encoding_util.m",
-        "breakpad/src/tools/mac/symupload/symupload.m",
-      ]
+  #   executable("symupload") {
+  #     sources = [
+  #       "breakpad/src/common/mac/HTTPGetRequest.m",
+  #       "breakpad/src/common/mac/HTTPMultipartUpload.m",
+  #       "breakpad/src/common/mac/HTTPPutRequest.m",
+  #       "breakpad/src/common/mac/HTTPRequest.m",
+  #       "breakpad/src/common/mac/HTTPSimplePostRequest.m",
+  #       "breakpad/src/common/mac/SymbolCollectorClient.m",
+  #       "breakpad/src/common/mac/encoding_util.m",
+  #       "breakpad/src/tools/mac/symupload/symupload.m",
+  #     ]
 
-      include_dirs = [ "breakpad/src/common/mac" ]
+  #     include_dirs = [ "breakpad/src/common/mac" ]
 
-      frameworks = [ "Foundation.framework" ]
+  #     frameworks = [ "Foundation.framework" ]
 
-      configs -= [ "//build/config/compiler:chromium_code" ]
-      configs += [ "//build/config/compiler:no_chromium_code" ]
-    }
-  } else {
-    binary_symlink("dump_syms") {
-      binary_label = ":$target_name($host_toolchain)"
-    }
-    binary_symlink("symupload") {
-      binary_label = ":$target_name($host_toolchain)"
-    }
-  }
+  #     configs -= [ "//build/config/compiler:chromium_code" ]
+  #     configs += [ "//build/config/compiler:no_chromium_code" ]
+  #   }
+  # } else {
+  #   binary_symlink("dump_syms") {
+  #     binary_label = ":$target_name($host_toolchain)"
+  #   }
+  #   binary_symlink("symupload") {
+  #     binary_label = ":$target_name($host_toolchain)"
+  #   }
+  # }
 }
 
 if (is_ios) {
@@ -822,189 +822,189 @@ if (is_win) {
   # Adding the second condition enables this block for the "true" host
   # toolchain as well, which allows creating 64-bit binaries even when the host
   # toolchain is redefined to a 32-bit target.
-  if (is_clang) {
-    symupload_toolchain = "//build/toolchain/win:win_clang_$host_cpu"
-  } else {
-    symupload_toolchain = "//build/toolchain/win:$host_cpu"
-  }
-  if (current_toolchain == host_toolchain ||
-      current_toolchain == symupload_toolchain) {
-    static_library("common_windows") {
-      include_dirs = [
-        "$visual_studio_path/DIA SDK/include",
-        "breakpad/src",
-      ]
+  # if (is_clang) {
+  #   symupload_toolchain = "//build/toolchain/win:win_clang_$host_cpu"
+  # } else {
+  #   symupload_toolchain = "//build/toolchain/win:$host_cpu"
+  # }
+  # if (current_toolchain == host_toolchain ||
+  #     current_toolchain == symupload_toolchain) {
+  #   static_library("common_windows") {
+  #     include_dirs = [
+  #       "$visual_studio_path/DIA SDK/include",
+  #       "breakpad/src",
+  #     ]
 
-      sources = [
-        "breakpad/src/common/windows/dia_util.cc",
-        "breakpad/src/common/windows/dia_util.h",
-        "breakpad/src/common/windows/guid_string.cc",
-        "breakpad/src/common/windows/guid_string.h",
-        "breakpad/src/common/windows/http_upload.cc",
-        "breakpad/src/common/windows/http_upload.h",
-        "breakpad/src/common/windows/module_info.h",
-        "breakpad/src/common/windows/omap.cc",
-        "breakpad/src/common/windows/omap.h",
-        "breakpad/src/common/windows/omap_internal.h",
-        "breakpad/src/common/windows/pdb_source_line_writer.cc",
-        "breakpad/src/common/windows/pdb_source_line_writer.h",
-        "breakpad/src/common/windows/pe_source_line_writer.cc",
-        "breakpad/src/common/windows/pe_source_line_writer.h",
-        "breakpad/src/common/windows/pe_util.cc",
-        "breakpad/src/common/windows/pe_util.h",
-        "breakpad/src/common/windows/string_utils-inl.h",
-        "breakpad/src/common/windows/string_utils.cc",
-        "breakpad/src/common/windows/symbol_collector_client.cc",
-        "breakpad/src/common/windows/symbol_collector_client.h",
-      ]
-    }
+  #     sources = [
+  #       "breakpad/src/common/windows/dia_util.cc",
+  #       "breakpad/src/common/windows/dia_util.h",
+  #       "breakpad/src/common/windows/guid_string.cc",
+  #       "breakpad/src/common/windows/guid_string.h",
+  #       "breakpad/src/common/windows/http_upload.cc",
+  #       "breakpad/src/common/windows/http_upload.h",
+  #       "breakpad/src/common/windows/module_info.h",
+  #       "breakpad/src/common/windows/omap.cc",
+  #       "breakpad/src/common/windows/omap.h",
+  #       "breakpad/src/common/windows/omap_internal.h",
+  #       "breakpad/src/common/windows/pdb_source_line_writer.cc",
+  #       "breakpad/src/common/windows/pdb_source_line_writer.h",
+  #       "breakpad/src/common/windows/pe_source_line_writer.cc",
+  #       "breakpad/src/common/windows/pe_source_line_writer.h",
+  #       "breakpad/src/common/windows/pe_util.cc",
+  #       "breakpad/src/common/windows/pe_util.h",
+  #       "breakpad/src/common/windows/string_utils-inl.h",
+  #       "breakpad/src/common/windows/string_utils.cc",
+  #       "breakpad/src/common/windows/symbol_collector_client.cc",
+  #       "breakpad/src/common/windows/symbol_collector_client.h",
+  #     ]
+  #   }
 
-    static_library("ms_symbol_server_converter") {
-      include_dirs = [
-        "$visual_studio_path/DIA SDK/include",
-        "breakpad/src",
-      ]
+  #   static_library("ms_symbol_server_converter") {
+  #     include_dirs = [
+  #       "$visual_studio_path/DIA SDK/include",
+  #       "breakpad/src",
+  #     ]
 
-      sources = [
-        "breakpad/src/tools/windows/converter/ms_symbol_server_converter.cc",
-      ]
+  #     sources = [
+  #       "breakpad/src/tools/windows/converter/ms_symbol_server_converter.cc",
+  #     ]
 
-      deps = [ "//third_party/breakpad:common_windows" ]
+  #     deps = [ "//third_party/breakpad:common_windows" ]
 
-      libs = [ "Pathcch.lib" ]
-    }
+  #     libs = [ "Pathcch.lib" ]
+  #   }
 
-    executable("dump_syms") {
-      # TODO(scottmg) using this with VS2015 may break the crash server.
-      # https://crbug.com/696671
-      include_dirs = [
-        "$visual_studio_path/DIA SDK/include",
-        "breakpad/src",
-      ]
+  #   executable("dump_syms") {
+  #     # TODO(scottmg) using this with VS2015 may break the crash server.
+  #     # https://crbug.com/696671
+  #     include_dirs = [
+  #       "$visual_studio_path/DIA SDK/include",
+  #       "breakpad/src",
+  #     ]
 
-      sources = [ "breakpad/src/tools/windows/dump_syms/dump_syms.cc" ]
+  #     sources = [ "breakpad/src/tools/windows/dump_syms/dump_syms.cc" ]
 
-      deps = [ "//third_party/breakpad:common_windows" ]
+  #     deps = [ "//third_party/breakpad:common_windows" ]
 
-      lib_dirs = []
-      if (current_cpu == "x64") {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
-      } else {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
-      }
+  #     lib_dirs = []
+  #     if (current_cpu == "x64") {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
+  #     } else {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
+  #     }
 
-      libs = [
-        "diaguids.lib",
-        "imagehlp.lib",
-      ]
+  #     libs = [
+  #       "diaguids.lib",
+  #       "imagehlp.lib",
+  #     ]
 
-      if (is_clang) {
-        # clang complains about microsoft-specific goto extensions. Instead of
-        # rewriting decade-old, goto-ridden code, disable the warning.
-        cflags = [ "-Wno-microsoft-goto" ]
-      }
-    }
+  #     if (is_clang) {
+  #       # clang complains about microsoft-specific goto extensions. Instead of
+  #       # rewriting decade-old, goto-ridden code, disable the warning.
+  #       cflags = [ "-Wno-microsoft-goto" ]
+  #     }
+  #   }
 
-    group("symupload") {
-      deps = [ ":symupload_win($symupload_toolchain)" ]
-    }
-    executable("symupload_win") {
-      include_dirs = [
-        "$visual_studio_path/DIA SDK/include",
-        "breakpad/src",
-      ]
-      output_name = "symupload"
+  #   group("symupload") {
+  #     deps = [ ":symupload_win($symupload_toolchain)" ]
+  #   }
+  #   executable("symupload_win") {
+  #     include_dirs = [
+  #       "$visual_studio_path/DIA SDK/include",
+  #       "breakpad/src",
+  #     ]
+  #     output_name = "symupload"
 
-      # Invert the normal logic which puts binaries built with the default
-      # (target) toolchain into the root output directory, and other toolchain
-      # binaries into subdirs. This gives preference to the native symupload,
-      # which is what's wanted in most situations. The cross-compiled binary
-      # can still be created (by building "symupload_win" instead of
-      # "symupload") and found in the corresponding toolchain subdir (e.g.
-      # //out/Release/win_clang_x86/ when cross-compiling to x86).
-      if (current_toolchain == symupload_toolchain) {
-        output_dir = "$root_build_dir"
-      } else {
-        output_name = "symupload_$target_cpu"
-        toolchain_parts =
-            string_split(get_path_info(current_toolchain, "name"), ":")
-        output_dir = "$root_out_dir/" + toolchain_parts[1]
-      }
+  #     # Invert the normal logic which puts binaries built with the default
+  #     # (target) toolchain into the root output directory, and other toolchain
+  #     # binaries into subdirs. This gives preference to the native symupload,
+  #     # which is what's wanted in most situations. The cross-compiled binary
+  #     # can still be created (by building "symupload_win" instead of
+  #     # "symupload") and found in the corresponding toolchain subdir (e.g.
+  #     # //out/Release/win_clang_x86/ when cross-compiling to x86).
+  #     if (current_toolchain == symupload_toolchain) {
+  #       output_dir = "$root_build_dir"
+  #     } else {
+  #       output_name = "symupload_$target_cpu"
+  #       toolchain_parts =
+  #           string_split(get_path_info(current_toolchain, "name"), ":")
+  #       output_dir = "$root_out_dir/" + toolchain_parts[1]
+  #     }
 
-      sources = [ "breakpad/src/tools/windows/symupload/symupload.cc" ]
+  #     sources = [ "breakpad/src/tools/windows/symupload/symupload.cc" ]
 
-      deps = [ "//third_party/breakpad:common_windows" ]
+  #     deps = [ "//third_party/breakpad:common_windows" ]
 
-      ldflags = [ "/LARGEADDRESSAWARE" ]
+  #     ldflags = [ "/LARGEADDRESSAWARE" ]
 
-      lib_dirs = []
-      if (current_cpu == "x64") {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
-      } else {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
-      }
+  #     lib_dirs = []
+  #     if (current_cpu == "x64") {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
+  #     } else {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
+  #     }
 
-      libs = [
-        "diaguids.lib",
-        "imagehlp.lib",
-      ]
+  #     libs = [
+  #       "diaguids.lib",
+  #       "imagehlp.lib",
+  #     ]
 
-      if (is_clang) {
-        # clang complains about microsoft-specific goto extensions. Instead of
-        # rewriting decade-old, goto-ridden code, disable the warning.
-        cflags = [ "-Wno-microsoft-goto" ]
-      }
-    }
+  #     if (is_clang) {
+  #       # clang complains about microsoft-specific goto extensions. Instead of
+  #       # rewriting decade-old, goto-ridden code, disable the warning.
+  #       cflags = [ "-Wno-microsoft-goto" ]
+  #     }
+  #   }
 
-    executable("google_converter") {
-      include_dirs = [
-        "$visual_studio_path/DIA SDK/include",
-        "breakpad/src",
-      ]
+  #   executable("google_converter") {
+  #     include_dirs = [
+  #       "$visual_studio_path/DIA SDK/include",
+  #       "breakpad/src",
+  #     ]
 
-      sources = [
-        "breakpad/src/tools/windows/converter_exe/converter.cc",
-        "breakpad/src/tools/windows/converter_exe/escaping.cc",
-        "breakpad/src/tools/windows/converter_exe/escaping.h",
-        "breakpad/src/tools/windows/converter_exe/http_download.cc",
-        "breakpad/src/tools/windows/converter_exe/tokenizer.cc",
-        "breakpad/src/tools/windows/converter_exe/winhttp_client.cc",
-        "breakpad/src/tools/windows/converter_exe/wininet_client.cc",
-      ]
+  #     sources = [
+  #       "breakpad/src/tools/windows/converter_exe/converter.cc",
+  #       "breakpad/src/tools/windows/converter_exe/escaping.cc",
+  #       "breakpad/src/tools/windows/converter_exe/escaping.h",
+  #       "breakpad/src/tools/windows/converter_exe/http_download.cc",
+  #       "breakpad/src/tools/windows/converter_exe/tokenizer.cc",
+  #       "breakpad/src/tools/windows/converter_exe/winhttp_client.cc",
+  #       "breakpad/src/tools/windows/converter_exe/wininet_client.cc",
+  #     ]
 
-      deps = [
-        "//third_party/breakpad:common_windows",
-        "//third_party/breakpad:ms_symbol_server_converter",
-      ]
+  #     deps = [
+  #       "//third_party/breakpad:common_windows",
+  #       "//third_party/breakpad:ms_symbol_server_converter",
+  #     ]
 
-      ldflags = [
-        "/DELAYLOAD:dbghelp.dll",
-        "/DELAYLOAD:dwmapi.dll",
-        "/DELAYLOAD:uxtheme.dll",
-      ]
+  #     ldflags = [
+  #       "/DELAYLOAD:dbghelp.dll",
+  #       "/DELAYLOAD:dwmapi.dll",
+  #       "/DELAYLOAD:uxtheme.dll",
+  #     ]
 
-      lib_dirs = []
-      if (current_cpu == "x64") {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
-      } else {
-        lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
-      }
+  #     lib_dirs = []
+  #     if (current_cpu == "x64") {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib/amd64" ]
+  #     } else {
+  #       lib_dirs += [ "$visual_studio_path/DIA SDK/lib" ]
+  #     }
 
-      libs = [
-        "diaguids.lib",
-        "imagehlp.lib",
-      ]
+  #     libs = [
+  #       "diaguids.lib",
+  #       "imagehlp.lib",
+  #     ]
 
-      if (is_clang) {
-        # clang complains about microsoft-specific goto extensions. Instead of
-        # rewriting decade-old, goto-ridden code, disable the warning.
-        cflags = [ "-Wno-microsoft-goto" ]
-      }
-    }
-  } else {
-    # handle dump_syms appropriately for Windows cross build when necessary,
-    # such as symlinking.
-  }
+  #     if (is_clang) {
+  #       # clang complains about microsoft-specific goto extensions. Instead of
+  #       # rewriting decade-old, goto-ridden code, disable the warning.
+  #       cflags = [ "-Wno-microsoft-goto" ]
+  #     }
+  #   }
+  # } else {
+  #   # handle dump_syms appropriately for Windows cross build when necessary,
+  #   # such as symlinking.
+  # }
 }
 
 if (is_ios) {
@@ -1074,9 +1074,9 @@ if (is_ios) {
 }
 
 if (is_win) {
-  group("client") {
-    public_configs = [ ":client_config" ]
-  }
+  # group("client") {
+  #   public_configs = [ ":client_config" ]
+  # }
 
   config("breakpad_handler_warnings") {
     if (is_clang) {
@@ -1112,15 +1112,15 @@ if (is_win) {
     configs += [ ":breakpad_handler_warnings" ]
   }
 
-  source_set("breakpad_sender") {
-    sources = [
-      "breakpad/src/client/windows/sender/crash_report_sender.cc",
-      "breakpad/src/client/windows/sender/crash_report_sender.h",
-      "breakpad/src/common/windows/http_upload.cc",
-      "breakpad/src/common/windows/http_upload.h",
-      "breakpad/src/common/windows/string_utils-inl.h",
-    ]
-    configs += [ ":sender_config" ]
-    public_configs = [ ":sender_config" ]
-  }
+  # source_set("breakpad_sender") {
+  #   sources = [
+  #     "breakpad/src/client/windows/sender/crash_report_sender.cc",
+  #     "breakpad/src/client/windows/sender/crash_report_sender.h",
+  #     "breakpad/src/common/windows/http_upload.cc",
+  #     "breakpad/src/common/windows/http_upload.h",
+  #     "breakpad/src/common/windows/string_utils-inl.h",
+  #   ]
+  #   configs += [ ":sender_config" ]
+  #   public_configs = [ ":sender_config" ]
+  # }
 }

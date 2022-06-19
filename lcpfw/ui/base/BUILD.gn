@@ -25,7 +25,7 @@ if (is_android) {
   import("//build/config/mac/rules.gni")
 }
 
-#build_ime = !is_ios
+build_ime = !is_ios
 
 # As part of building Chrome on iOS, it is necessary to run a tool on
 # the host to load datapack and generate output in a format defined
@@ -446,7 +446,7 @@ component("base") {
     "//third_party/zlib/google:compression_utils",
     "//ui/base:data_exchange",
     "//ui/base/clipboard:clipboard_types",
-    #"//ui/base/dragdrop/mojom",
+    "//ui/base/dragdrop/mojom",
     "//ui/display",
     "//ui/events",
     "//ui/events/devices",
@@ -638,6 +638,134 @@ component("features") {
   ]
   if (!is_ios) {
     #deps += [ "//media:media_buildflags" ]
+  }
+}
+
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "resource/mock_resource_bundle_delegate.cc",
+    "resource/mock_resource_bundle_delegate.h",
+  ]
+
+  if (is_mac) {
+    sources += [
+      "test/cocoa_helper.h",
+      "test/cocoa_helper.mm",
+      "test/menu_test_observer.h",
+      "test/menu_test_observer.mm",
+      "test/ns_ax_tree_validator.h",
+      "test/ns_ax_tree_validator.mm",
+      "test/nswindow_fullscreen_notification_waiter.h",
+      "test/nswindow_fullscreen_notification_waiter.mm",
+      "test/scoped_fake_full_keyboard_access.h",
+      "test/scoped_fake_full_keyboard_access.mm",
+      "test/scoped_fake_nswindow_focus.h",
+      "test/scoped_fake_nswindow_focus.mm",
+      "test/scoped_fake_nswindow_fullscreen.h",
+      "test/scoped_fake_nswindow_fullscreen.mm",
+      "test/scoped_preferred_scroller_style_mac.h",
+      "test/scoped_preferred_scroller_style_mac.mm",
+      "test/ui_controls_mac.mm",
+      "test/view_tree_validator.mm",
+      "test/windowed_nsnotification_observer.h",
+      "test/windowed_nsnotification_observer.mm",
+    ]
+  }
+
+  if (is_win) {
+    sources += [
+      "test/ui_controls_internal_win.cc",
+      "test/ui_controls_internal_win.h",
+    ]
+  }
+
+  if (!is_ios) {
+    sources += [
+      "accelerators/test_accelerator_target.cc",
+      "accelerators/test_accelerator_target.h",
+      "test/mock_base_window.cc",
+      "test/mock_base_window.h",
+      "test/test_dialog_model_host.h",
+      "test/ui_controls.h",
+      "test/view_tree_validator.h",
+    ]
+  } else {
+    sources += [
+      "test/ios/keyboard_appearance_listener.h",
+      "test/ios/keyboard_appearance_listener.mm",
+      "test/ios/ui_image_test_utils.h",
+      "test/ios/ui_image_test_utils.mm",
+    ]
+  }
+
+  if (use_aura) {
+    sources += [
+      "test/ui_controls_aura.cc",
+      "test/ui_controls_aura.h",
+    ]
+  }
+
+  public_deps = [ ":base" ]
+  deps = [
+    "//base",
+    "//base/test:test_config",
+    "//base/test:test_support",
+    "//build:chromeos_buildflags",
+    "//skia",
+    #"//testing/gmock",
+    #"//testing/gtest",
+    "//ui/base:ui_data_pack",
+    "//ui/display:test_support",
+    "//ui/events:events_base",
+    "//ui/events:test_support",
+    "//ui/gfx",
+    "//ui/gfx/geometry",
+  ]
+
+  if (is_ios) {
+    deps -= [
+      "//ui/events:events_base",
+      "//ui/events:test_support",
+    ]
+  }
+
+  if (build_ime) {
+    sources += [
+      "ime/dummy_input_method.cc",
+      "ime/dummy_input_method.h",
+      "ime/dummy_text_input_client.cc",
+      "ime/dummy_text_input_client.h",
+      "ime/fake_text_input_client.cc",
+      "ime/fake_text_input_client.h",
+    ]
+
+    deps += [
+      "//ui/base/ime",
+      "//ui/events",
+    ]
+
+    if (is_win) {
+      deps += [ "//ui/base/ime/win" ]
+    }
+  }
+
+  if (is_chromeos_ash) {
+    sources += [
+      "ime/chromeos/mock_component_extension_ime_manager.cc",
+      "ime/chromeos/mock_component_extension_ime_manager.h",
+      "ime/chromeos/mock_component_extension_ime_manager_delegate.cc",
+      "ime/chromeos/mock_component_extension_ime_manager_delegate.h",
+      "ime/chromeos/mock_ime_candidate_window_handler.cc",
+      "ime/chromeos/mock_ime_candidate_window_handler.h",
+      "ime/chromeos/mock_ime_engine_handler.cc",
+      "ime/chromeos/mock_ime_engine_handler.h",
+      "ime/chromeos/mock_ime_input_context_handler.cc",
+      "ime/chromeos/mock_ime_input_context_handler.h",
+      "ime/chromeos/mock_input_method_manager.cc",
+      "ime/chromeos/mock_input_method_manager.h",
+    ]
+    deps += [ "//ui/base/ime/chromeos" ]
   }
 }
 

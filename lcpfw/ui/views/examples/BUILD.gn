@@ -107,7 +107,7 @@ component("views_examples_lib") {
     "//ui/gfx/geometry",
     "//ui/native_theme",
     "//ui/resources",
-    "//ui/resources:ui_test_pak",
+    #"//ui/resources:ui_test_pak",
     "//ui/strings:ui_strings",
     "//ui/views",
   ]
@@ -133,7 +133,7 @@ source_set("views_examples_proc") {
   deps = [
     ":views_examples_lib",
     "//base",
-    "//base/test:test_support",
+    #"//base/test:test_support",
     "//build:chromeos_buildflags",
     "//cc/paint",
     "//components/viz/host",
@@ -142,7 +142,7 @@ source_set("views_examples_proc") {
     "//skia",
     "//ui/base",
     "//ui/compositor",
-    "//ui/compositor:test_support",
+    #"//ui/compositor:test_support",
     "//ui/gfx",
     "//ui/views",
     "//ui/views:test_support",
@@ -150,11 +150,11 @@ source_set("views_examples_proc") {
 
   if (is_win || is_mac || (is_linux || is_chromeos_lacros)) {
     sources += [
-      "examples_skia_gold_pixel_diff.cc",
-      "examples_skia_gold_pixel_diff.h",
+      #"examples_skia_gold_pixel_diff.cc",
+      #"examples_skia_gold_pixel_diff.h",
     ]
     deps += [
-      "//ui/base:pixel_diff_test_support",
+      #"//ui/base:pixel_diff_test_support",
       "//ui/snapshot",
     ]
   }
@@ -190,74 +190,74 @@ executable("views_examples") {
     ":views_examples_lib",
     ":views_examples_proc",
     "//base",
-    "//base/test:test_support",
+    #"//base/test:test_support",
     "//build/win:default_exe_manifest",
     "//ui/resources:ui_test_pak",
   ]
 }
 
-component("views_examples_with_content_lib") {
-  testonly = true
-  sources = [
-    "examples_window_with_content.cc",
-    "examples_window_with_content.h",
-    "views_examples_with_content_export.h",
-    "webview_example.cc",
-    "webview_example.h",
-  ]
+# component("views_examples_with_content_lib") {
+#   testonly = true
+#   sources = [
+#     "examples_window_with_content.cc",
+#     "examples_window_with_content.h",
+#     "views_examples_with_content_export.h",
+#     "webview_example.cc",
+#     "webview_example.h",
+#   ]
 
-  defines = [ "VIEWS_EXAMPLES_WITH_CONTENT_IMPLEMENTATION" ]
+#   defines = [ "VIEWS_EXAMPLES_WITH_CONTENT_IMPLEMENTATION" ]
 
-  deps = [
-    ":views_examples_resources_grd",
-    ":views_examples_resources_pak",
-    "//base",
-    "//content",
-    "//skia",
-    "//ui/events",
-    "//ui/views",
-    "//ui/views/controls/webview",
-    "//url",
-  ]
-  public_deps = [ ":views_examples_lib" ]
-}
+#   deps = [
+#     ":views_examples_resources_grd",
+#     ":views_examples_resources_pak",
+#     "//base",
+#     "//content",
+#     "//skia",
+#     "//ui/events",
+#     "//ui/views",
+#     "//ui/views/controls/webview",
+#     "//url",
+#   ]
+#   public_deps = [ ":views_examples_lib" ]
+# }
 
-executable("views_examples_with_content") {
-  testonly = true
+# executable("views_examples_with_content") {
+#   testonly = true
 
-  sources = [ "examples_with_content_main.cc" ]
+#   sources = [ "examples_with_content_main.cc" ]
 
-  defines = [ "VIEWS_EXAMPLES_WITH_CONTENT_IMPLEMENTATION" ]
+#   defines = [ "VIEWS_EXAMPLES_WITH_CONTENT_IMPLEMENTATION" ]
 
-  deps = [
-    ":copy_content_resources",
-    ":views_examples_with_content_lib",
-    "//base",
-    "//build/win:default_exe_manifest",
-    "//content",
-    "//content:sandbox_helper_win",
-    "//sandbox",
-    "//ui/views_content_client",
-  ]
+#   deps = [
+#     ":copy_content_resources",
+#     ":views_examples_with_content_lib",
+#     "//base",
+#     "//build/win:default_exe_manifest",
+#     "//content",
+#     "//content:sandbox_helper_win",
+#     "//sandbox",
+#     "//ui/views_content_client",
+#   ]
 
-  if (is_win) {
-    configs += [ "//build/config/win:windowed" ]
-    configs -= [ "//build/config/win:console" ]
-  }
+#   if (is_win) {
+#     configs += [ "//build/config/win:windowed" ]
+#     configs -= [ "//build/config/win:console" ]
+#   }
 
-  if (is_mac) {
-    deps += [ "//sandbox/mac:seatbelt" ]
-  }
-}
+#   if (is_mac) {
+#     deps += [ "//sandbox/mac:seatbelt" ]
+#   }
+# }
 
-copy("copy_content_resources") {
-  deps = [ "//content:content_resources" ]
-  sources = [ "$root_gen_dir/content/content_resources.pak" ]
-  outputs = [ "$root_out_dir/content_resources.pak" ]
-}
+# copy("copy_content_resources") {
+#   deps = [ "//content:content_resources" ]
+#   sources = [ "$root_gen_dir/content/content_resources.pak" ]
+#   outputs = [ "$root_out_dir/content_resources.pak" ]
+# }
 
 grit("views_examples_resources_grd") {
-  testonly = true
+  #testonly = true
   source = "views_examples_resources.grd"
   outputs = [
     "grit/views_examples_resources.h",
@@ -266,52 +266,52 @@ grit("views_examples_resources_grd") {
 }
 
 copy("views_examples_resources_pak") {
-  testonly = true
+  #testonly = true
   sources = [ "$target_gen_dir/views_examples_resources.pak" ]
   outputs = [ "$root_out_dir/views_examples_resources.pak" ]
   public_deps = [ ":views_examples_resources_grd" ]
 }
 
-test("views_examples_unittests") {
-  use_xvfb = use_xvfb_in_this_config
+# test("views_examples_unittests") {
+#   use_xvfb = use_xvfb_in_this_config
 
-  sources = [
-    "examples_unittest.cc",
-    "examples_unittest_main.cc",
-  ]
+#   sources = [
+#     "examples_unittest.cc",
+#     "examples_unittest_main.cc",
+#   ]
 
-  deps = [
-    ":views_examples_lib",
-    ":views_examples_proc",
-    "//base",
-    "//base/test:test_support",
-    "//components/viz/host",
-    "//components/viz/service",
-    "//mojo/core/embedder",
-    "//ui/base",
-    "//ui/base/ime/init",
-    "//ui/compositor",
-    "//ui/compositor:test_support",
-    "//ui/gfx",
-    "//ui/gl",
-    "//ui/gl/init",
-    "//ui/resources:ui_test_pak",
-    "//ui/snapshot",
-    "//ui/views",
-    "//ui/views:test_support",
-  ]
+#   deps = [
+#     ":views_examples_lib",
+#     ":views_examples_proc",
+#     "//base",
+#     "//base/test:test_support",
+#     "//components/viz/host",
+#     "//components/viz/service",
+#     "//mojo/core/embedder",
+#     "//ui/base",
+#     "//ui/base/ime/init",
+#     "//ui/compositor",
+#     "//ui/compositor:test_support",
+#     "//ui/gfx",
+#     "//ui/gl",
+#     "//ui/gl/init",
+#     "//ui/resources:ui_test_pak",
+#     "//ui/snapshot",
+#     "//ui/views",
+#     "//ui/views:test_support",
+#   ]
 
-  if (use_aura) {
-    deps += [
-      "//ui/aura",
-      "//ui/wm",
-    ]
-  }
+#   if (use_aura) {
+#     deps += [
+#       "//ui/aura",
+#       "//ui/wm",
+#     ]
+#   }
 
-  data_deps = [
-    ":views_examples_resources_pak",
-    "//ui/resources:ui_test_pak_data",
-  ]
+#   data_deps = [
+#     ":views_examples_resources_pak",
+#     "//ui/resources:ui_test_pak_data",
+#   ]
 
-  data = [ "$root_out_dir/views_examples_resources.pak" ]
-}
+#   data = [ "$root_out_dir/views_examples_resources.pak" ]
+# }

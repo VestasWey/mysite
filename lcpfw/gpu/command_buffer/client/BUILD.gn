@@ -40,13 +40,13 @@ group("raster") {
   }
 }
 
-# group("webgpu") {
-#   if (is_component_build) {
-#     public_deps = [ "//gpu:webgpu" ]
-#   } else {
-#     public_deps = [ ":webgpu_sources" ]
-#   }
-# }
+group("webgpu") {
+  if (is_component_build) {
+    public_deps = [ "//gpu:webgpu" ]
+  } else {
+    public_deps = [ ":webgpu_sources" ]
+  }
+}
 
 source_set("client_sources") {
   # External code should depend on this via //gpu/client above rather than
@@ -209,18 +209,18 @@ source_set("raster_interface") {
   ]
 }
 
-# source_set("webgpu_interface") {
-#   sources = [
-#     "webgpu_interface.h",
-#     "webgpu_interface_autogen.h",
-#   ]
-#   public_configs = [ "//third_party/khronos:khronos_headers" ]
-#   deps = [
-#     ":interface_base",
-#     "//base",
-#     "//gpu/command_buffer/common:webgpu",
-#   ]
-# }
+source_set("webgpu_interface") {
+  sources = [
+    "webgpu_interface.h",
+    "webgpu_interface_autogen.h",
+  ]
+  public_configs = [ "//third_party/khronos:khronos_headers" ]
+  deps = [
+    ":interface_base",
+    "//base",
+    "//gpu/command_buffer/common:webgpu",
+  ]
+}
 
 # Library emulates GLES2 using command_buffers.
 component("gles2_implementation") {
@@ -290,37 +290,37 @@ source_set("raster_sources") {
   ]
 }
 
-# source_set("webgpu_sources") {
-#   visibility = [ "//gpu/*" ]
+source_set("webgpu_sources") {
+  visibility = [ "//gpu/*" ]
 
-#   configs += [ "//gpu:webgpu_implementation" ]
-#   deps = [
-#     ":client",
-#     ":gles2_implementation",
-#     ":webgpu_interface",
-#     "//gpu/command_buffer/common:webgpu",
-#     "//third_party/dawn/src/dawn:dawn_proc",
-#   ]
-#   public_deps = [ "//third_party/dawn/src/dawn:dawn_headers" ]
-#   sources = [
-#     "webgpu_cmd_helper.cc",
-#     "webgpu_cmd_helper.h",
-#     "webgpu_cmd_helper_autogen.h",
-#     "webgpu_export.h",
-#     "webgpu_implementation.cc",
-#     "webgpu_implementation.h",
-#     "webgpu_implementation_autogen.h",
-#     "webgpu_implementation_impl_autogen.h",
-#   ]
-#   if (use_dawn) {
-#     sources += [
-#       "dawn_client_memory_transfer_service.cc",
-#       "dawn_client_memory_transfer_service.h",
-#       "dawn_client_serializer.cc",
-#       "dawn_client_serializer.h",
-#     ]
-#   }
-# }
+  configs += [ "//gpu:webgpu_implementation" ]
+  deps = [
+    ":client",
+    ":gles2_implementation",
+    ":webgpu_interface",
+    "//gpu/command_buffer/common:webgpu",
+    "//third_party/dawn/src/dawn:dawn_proc",
+  ]
+  public_deps = [ "//third_party/dawn/src/dawn:dawn_headers" ]
+  sources = [
+    "webgpu_cmd_helper.cc",
+    "webgpu_cmd_helper.h",
+    "webgpu_cmd_helper_autogen.h",
+    "webgpu_export.h",
+    "webgpu_implementation.cc",
+    "webgpu_implementation.h",
+    "webgpu_implementation_autogen.h",
+    "webgpu_implementation_impl_autogen.h",
+  ]
+  if (use_dawn) {
+    sources += [
+      "dawn_client_memory_transfer_service.cc",
+      "dawn_client_memory_transfer_service.h",
+      "dawn_client_serializer.cc",
+      "dawn_client_serializer.h",
+    ]
+  }
+}
 
 # Library emulates GLES2 using command_buffers.
 component("gles2_implementation_no_check") {

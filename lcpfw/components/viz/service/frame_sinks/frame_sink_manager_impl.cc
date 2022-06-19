@@ -18,8 +18,8 @@
 #include "components/viz/service/display/shared_bitmap_manager.h"
 #include "components/viz/service/display_embedder/output_surface_provider.h"
 #include "components/viz/service/frame_sinks/compositor_frame_sink_support.h"
-#include "components/viz/service/frame_sinks/video_capture/capturable_frame_sink.h"
-#include "components/viz/service/frame_sinks/video_capture/frame_sink_video_capturer_impl.h"
+//#include "components/viz/service/frame_sinks/video_capture/capturable_frame_sink.h"
+//#include "components/viz/service/frame_sinks/video_capture/frame_sink_video_capturer_impl.h"
 #include "components/viz/service/surfaces/pending_copy_output_request.h"
 
 namespace viz {
@@ -79,7 +79,7 @@ FrameSinkManagerImpl::FrameSinkManagerImpl(
 
 FrameSinkManagerImpl::~FrameSinkManagerImpl() {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-  video_capturers_.clear();
+  //video_capturers_.clear();
 
   // All mojom::CompositorFrameSinks and BeginFrameSources should be deleted by
   // this point.
@@ -279,11 +279,12 @@ void FrameSinkManagerImpl::AddVideoDetectorObserver(
 
 void FrameSinkManagerImpl::CreateVideoCapturer(
     mojo::PendingReceiver<mojom::FrameSinkVideoCapturer> receiver) {
-  video_capturers_.emplace(std::make_unique<FrameSinkVideoCapturerImpl>(
-      this, std::move(receiver),
-      std::make_unique<media::VideoCaptureOracle>(
-          true /* enable_auto_throttling */),
-      log_capture_pipeline_in_webrtc_));
+  //video_capturers_.emplace(std::make_unique<FrameSinkVideoCapturerImpl>(
+  //    this, std::move(receiver),
+  //    std::make_unique<media::VideoCaptureOracle>(
+  //        true /* enable_auto_throttling */),
+  //    log_capture_pipeline_in_webrtc_));
+    NOTREACHED();
 }
 
 void FrameSinkManagerImpl::EvictSurfaces(
@@ -362,10 +363,10 @@ void FrameSinkManagerImpl::RegisterCompositorFrameSinkSupport(
 
   support_map_[frame_sink_id] = support;
 
-  for (auto& capturer : video_capturers_) {
+  /*for (auto& capturer : video_capturers_) {
     if (capturer->requested_target() == frame_sink_id)
       capturer->SetResolvedTarget(support);
-  }
+  }*/
 
   auto it = frame_sink_source_map_.find(frame_sink_id);
   if (it != frame_sink_source_map_.end() && it->second.source)
@@ -382,10 +383,10 @@ void FrameSinkManagerImpl::UnregisterCompositorFrameSinkSupport(
   for (auto& observer : observer_list_)
     observer.OnDestroyedCompositorFrameSink(frame_sink_id);
 
-  for (auto& capturer : video_capturers_) {
+  /*for (auto& capturer : video_capturers_) {
     if (capturer->requested_target() == frame_sink_id)
       capturer->OnTargetWillGoAway();
-  }
+  }*/
 
   support_map_.erase(frame_sink_id);
 }
@@ -466,18 +467,18 @@ void FrameSinkManagerImpl::RecursivelyDetachBeginFrameSource(
     RecursivelyDetachBeginFrameSource(child, source);
 }
 
-CapturableFrameSink* FrameSinkManagerImpl::FindCapturableFrameSink(
-    const FrameSinkId& frame_sink_id) {
-  const auto it = support_map_.find(frame_sink_id);
-  if (it == support_map_.end())
-    return nullptr;
-  return it->second;
-}
-
-void FrameSinkManagerImpl::OnCapturerConnectionLost(
-    FrameSinkVideoCapturerImpl* capturer) {
-  video_capturers_.erase(capturer);
-}
+//CapturableFrameSink* FrameSinkManagerImpl::FindCapturableFrameSink(
+//    const FrameSinkId& frame_sink_id) {
+//  const auto it = support_map_.find(frame_sink_id);
+//  if (it == support_map_.end())
+//    return nullptr;
+//  return it->second;
+//}
+//
+//void FrameSinkManagerImpl::OnCapturerConnectionLost(
+//    FrameSinkVideoCapturerImpl* capturer) {
+//  video_capturers_.erase(capturer);
+//}
 
 bool FrameSinkManagerImpl::ChildContains(
     const FrameSinkId& child_frame_sink_id,

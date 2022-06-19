@@ -150,9 +150,9 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl : public gpu::GpuChannelManagerDelegate,
           jea_receiver) override;
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 
-  void CreateVideoEncodeAcceleratorProvider(
+  /*void CreateVideoEncodeAcceleratorProvider(
       mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
-          vea_provider_receiver) override;
+          vea_provider_receiver) override;*/
   void CreateGpuMemoryBuffer(gfx::GpuMemoryBufferId id,
                              const gfx::Size& size,
                              gfx::BufferFormat format,
@@ -243,7 +243,8 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl : public gpu::GpuChannelManagerDelegate,
   bool is_initialized() const { return !!gpu_host_; }
 
   media::MediaGpuChannelManager* media_gpu_channel_manager() {
-    return media_gpu_channel_manager_.get();
+    //return media_gpu_channel_manager_.get();
+      return nullptr;
   }
 
   gpu::GpuChannelManager* gpu_channel_manager() {
@@ -382,7 +383,7 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl : public gpu::GpuChannelManagerDelegate,
 
   mojo::SharedRemote<mojom::GpuHost> gpu_host_;
   std::unique_ptr<gpu::GpuChannelManager> gpu_channel_manager_;
-  std::unique_ptr<media::MediaGpuChannelManager> media_gpu_channel_manager_;
+  //std::unique_ptr<media::MediaGpuChannelManager> media_gpu_channel_manager_;
 
   // On some platforms (e.g. android webview), the SyncPointManager and
   // SharedImageManager comes from external sources.

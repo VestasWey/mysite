@@ -37,6 +37,5 @@ public:
     virtual void PostAppStart() {}
     virtual void PreMainMessageLoopRun() {}
     virtual void PostMainMessageLoopRun() {}
-    virtual void AppTearDown() {}
 };
 

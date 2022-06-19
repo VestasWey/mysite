@@ -128,6 +128,63 @@ if (!use_static_angle) {
   }
 }  # if (!use_static_angle)
 
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "command_buffer/client/client_test_helper.cc",
+    "command_buffer/client/client_test_helper.h",
+    "command_buffer/client/gles2_interface_stub.cc",
+    "command_buffer/client/gles2_interface_stub.h",
+    "command_buffer/client/gles2_interface_stub_autogen.h",
+    "command_buffer/client/gles2_interface_stub_impl_autogen.h",
+    #"command_buffer/client/webgpu_interface_stub.cc",
+    #"command_buffer/client/webgpu_interface_stub.h",
+    #"command_buffer/client/webgpu_interface_stub_autogen.h",
+    #"command_buffer/client/webgpu_interface_stub_impl_autogen.h",
+    "command_buffer/service/copy_texture_chromium_mock.cc",
+    "command_buffer/service/copy_texture_chromium_mock.h",
+    "command_buffer/service/error_state_mock.cc",
+    "command_buffer/service/error_state_mock.h",
+    "command_buffer/service/gles2_cmd_decoder_mock.cc",
+    "command_buffer/service/gles2_cmd_decoder_mock.h",
+    "command_buffer/service/mocks.cc",
+    "command_buffer/service/mocks.h",
+    "command_buffer/service/test_helper.cc",
+    "command_buffer/service/test_helper.h",
+    "command_buffer/service/test_shared_image_backing.cc",
+    "command_buffer/service/test_shared_image_backing.h",
+    "ipc/raster_in_process_context.cc",
+    "ipc/raster_in_process_context.h",
+    "ipc/service/gpu_memory_buffer_factory_test_template.h",
+    #"ipc/webgpu_in_process_context.cc",
+    #"ipc/webgpu_in_process_context.h",
+  ]
+
+  public_deps = [
+    ":gles2",
+    ":gpu",
+    #":webgpu",
+    "//gpu/command_buffer/client:gles2_interface",
+    #"//gpu/command_buffer/client:webgpu_interface",
+    "//gpu/ipc:gpu_thread_holder",
+  ]
+  deps = [
+    "//base/test:test_support",
+    "//gpu/command_buffer/client:raster",
+    "//gpu/command_buffer/common",
+    "//gpu/ipc:gl_in_process_context",
+    "//gpu/ipc/common",
+    "//gpu/ipc/service",
+    "//gpu/skia_bindings:skia_bindings",
+    #"//testing/gmock",
+    #"//testing/gtest",
+    "//third_party/angle:translator",
+    "//ui/gfx:test_support",
+    #"//ui/gl:gl_unittest_utils",
+    "//ui/gl:test_support",
+  ]
+}
+
 if (!is_android && !is_fuchsia && !is_chromeos_ash) {
   proto_library("gl_lpm_fuzzer_proto") {
     sources = [ "command_buffer/tests/lpm/gl_lpm_fuzzer.proto" ]

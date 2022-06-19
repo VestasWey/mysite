@@ -63,7 +63,7 @@
 
 #if defined(OS_WIN)
 #include "ui/base/win/scoped_ole_initializer.h"
-#include "ui/views/examples/examples_skia_gold_pixel_diff.h"
+//#include "ui/views/examples/examples_skia_gold_pixel_diff.h"
 #endif
 
 #if defined(USE_OZONE)
@@ -178,22 +178,22 @@ ExamplesExitCode ExamplesMainProc(bool under_test) {
     base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
 
 #if defined(OS_WIN)
-    ExamplesSkiaGoldPixelDiff pixel_diff;
-    views::AnyWidgetObserver widget_observer{
-        views::test::AnyWidgetTestPasskey()};
+    //ExamplesSkiaGoldPixelDiff pixel_diff;
+    /*views::AnyWidgetObserver widget_observer{
+        views::test::AnyWidgetTestPasskey()};*/
 
     // If this app isn't a test, it shouldn't timeout.
     auto disable_timeout =
         std::make_unique<base::test::ScopedDisableRunLoopTimeout>();
 
-    if (under_test) {
-      pixel_diff.Init("ViewsExamples");
-      widget_observer.set_shown_callback(
-          base::BindRepeating(&ExamplesSkiaGoldPixelDiff::OnExamplesWindowShown,
-                              base::Unretained(&pixel_diff)));
-      // Enable the timeout since we're not running in a test.
-      disable_timeout.reset();
-    }
+    //if (under_test) {
+    //  pixel_diff.Init("ViewsExamples");
+    //  widget_observer.set_shown_callback(
+    //      base::BindRepeating(&ExamplesSkiaGoldPixelDiff::OnExamplesWindowShown,
+    //                          base::Unretained(&pixel_diff)));
+    //  // Enable the timeout since we're not running in a test.
+    //  disable_timeout.reset();
+    //}
 #else
     base::test::ScopedDisableRunLoopTimeout disable_timeout;
 #endif
@@ -203,7 +203,7 @@ ExamplesExitCode ExamplesMainProc(bool under_test) {
     run_loop.Run();
 
 #if defined(OS_WIN)
-    compare_result = pixel_diff.get_result();
+    //compare_result = pixel_diff.get_result();
 #endif
 
     ui::ResourceBundle::CleanupSharedInstance();

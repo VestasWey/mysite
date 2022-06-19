@@ -31,7 +31,11 @@ namespace {
 bool NativeThemeColorIdToColorId(NativeTheme::ColorId native_theme_color_id,
                                  ColorId* color_id) {
   using NTCID = NativeTheme::ColorId;
+#ifdef __clang__
   static constexpr const auto map =
+#else
+  static /*constexpr*/ const base::fixed_flat_map<NativeTheme::ColorId, ColorId, 74, std::less<>> map =
+#endif
       base::MakeFixedFlatMap<NativeTheme::ColorId, ColorId>({
         {NTCID::kColorId_AlertSeverityHigh, kColorAlertHighSeverity},
         {NTCID::kColorId_AlertSeverityLow, kColorAlertLowSeverity},
@@ -151,7 +155,7 @@ bool NativeThemeColorIdToColorId(NativeTheme::ColorId native_theme_color_id,
         {NTCID::kColorId_WindowBackground, kColorWindowBackground},
       });
   DCHECK(color_id);
-  auto* color_it = map.find(native_theme_color_id);
+  auto color_it = map.find(native_theme_color_id);
   if (color_it != map.cend()) {
     *color_id = color_it->second;
     return true;

@@ -764,6 +764,11 @@ config("compiler") {
     asmflags += cflags
     asmflags += cflags_c
   }
+
+  # 暂时去掉【error C2397: 从“unsigned int”转换到“int”需要收缩转换】的错误
+  # if (is_win && !is_clang) {
+  #   ldflags += [ "/ld" ]
+  # }
 }
 
 # The BUILDCONFIG file sets this config on targets by default, which means when
@@ -2118,7 +2123,7 @@ config("no_optimize") {
       "/Ob0",  # Disable all inlining (on by default).
       "/GF",  # Enable string pooling (off by default).
     ]
-
+  
     if (target_cpu == "arm64") {
       # Disable omitting frame pointers for no_optimize build because stack
       # traces on Windows ARM64 rely on it.

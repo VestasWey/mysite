@@ -694,6 +694,9 @@ class BASE_EXPORT ErrnoLogMessage : public LogMessage {
 //       statements, there's no guarantee that it will stay closed
 //       after this call.
 BASE_EXPORT void CloseLogFile();
+// modify [
+BASE_EXPORT void FlushLogFile();
+// ]
 
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 // Returns a new file handle that will write to the same destination as the

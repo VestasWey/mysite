@@ -1,0 +1,106 @@
+
+#import("//build/config/locales.gni")   # chromium support locales
+
+support_locales = [
+    "en-US",
+    "zh-CN",
+]
+
+# 直接使用“//build/util/process_version.gni：process_version”算了，不用自己写了
+# template("win_ver_rc") {
+
+#   _winrc_custom_target = target_name + "_winrc"
+#   action(_winrc_custom_target) {
+
+#     #script = rebase_path(get_path_info("resources/version/gen_version.py", "abspath"))
+#     script = rebase_path("//build/util/version.py")
+
+#     if (defined(invoker.name_info_file)) {
+#       name_info_file = "${invoker.name_info_file}"
+#     } else {
+#       assert("Need module name info file, to determine INTERNAL_NAME/ORIGINAL_FILENAME")
+#     }
+
+#     # Compute the path from the root to this file.
+#     name_info_file = rebase_path(name_info_file)
+#     rc_in_file = rebase_path("resources/version/win.rc.in")
+#     ver_info_file = rebase_path("resources/version/VERSION")
+#     branding_file = rebase_path("resources/version/BRANDING")
+#     lastchange_file = rebase_path("resources/version/LASTCHANGE")
+#     dst_file = rebase_path(root_gen_dir + "/app/resources/win/$target_name.rc")
+
+#     # print("$target_name rawpath -----------")
+#     # print(script)
+#     # print(rc_in_file)
+#     # print(name_info_file)
+#     # print(ver_info_file)
+#     # print(branding_file)
+#     # print(lastchange_file)
+#     # print(dst_file)
+
+#     outputs = [ "$root_gen_dir/app/resources/win/$target_name.rc" ]
+
+#     args = [
+#       "-i",
+#       rc_in_file,
+#       "-f",
+#       name_info_file,
+#       "-f",
+#       branding_file,
+#       "-f",
+#       lastchange_file,
+#       "-f",
+#       ver_info_file,
+#       "-o",
+#       dst_file
+#     ]
+
+#     # forward_variables_from(invoker,
+#     #                        [
+#     #                          "deps",
+#     #                          "public_deps",
+#     #                          "testonly",
+#     #                          "visibility",
+#     #                        ])
+
+#     #public_deps = [ ":$target_name" + "_rc" ]
+#   }
+  
+#   # This is the thing that people actually link with, it must be named the
+#   # same as the argument the template was invoked with.
+#   source_set(target_name) {
+#     testonly = defined(invoker.testonly) && invoker.testonly
+
+#     # Since we generate a file, we need to be run before the targets that
+#     # depend on us.
+#     sources = []
+#     foreach(_output, _grit_outputs) {
+#       _extension = get_path_info(_output, "extension")
+#       if (_extension != "json" && _extension != "gz" && _extension != "pak" &&
+#           _extension != "xml") {
+#         sources += [ _output ]
+#       }
+#     }
+
+#     # Deps set on the template invocation will go on the action that runs
+#     # grit above rather than this library. This target needs to depend on the
+#     # action publicly so other scripts can take the outputs from the grit
+#     # script as inputs.
+#     public_deps = [ ":$_winrc_custom_target" ]
+
+#     deps = [ "//base" ]
+
+#     if (defined(invoker.public_configs)) {
+#       public_configs += invoker.public_configs
+#     }
+
+#     if (defined(invoker.configs)) {
+#       configs += invoker.configs
+#     }
+
+#     if (defined(invoker.visibility)) {
+#       visibility = invoker.visibility
+#     }
+#     output_name = _grit_output_name
+#   }
+# }

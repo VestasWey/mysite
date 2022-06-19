@@ -417,7 +417,7 @@ class VIEWS_EXPORT View : public ui::LayerDelegate,
   // for new code.
   template <typename T>
   T* AddChildView(T* view) {
-    AddChildViewAtImpl(view, int{children_.size()});
+    AddChildViewAtImpl(view, int{(int)children_.size()});
     return view;
   }
   template <typename T>

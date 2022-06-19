@@ -27,7 +27,7 @@
 #include "components/viz/service/frame_sinks/compositor_frame_sink_impl.h"
 #include "components/viz/service/frame_sinks/frame_sink_observer.h"
 #include "components/viz/service/frame_sinks/root_compositor_frame_sink_impl.h"
-#include "components/viz/service/frame_sinks/video_capture/frame_sink_video_capturer_manager.h"
+//#include "components/viz/service/frame_sinks/video_capture/frame_sink_video_capturer_manager.h"
 #include "components/viz/service/frame_sinks/video_detector.h"
 #include "components/viz/service/hit_test/hit_test_aggregator_delegate.h"
 #include "components/viz/service/hit_test/hit_test_manager.h"
@@ -55,7 +55,7 @@ class SharedBitmapManager;
 // detail for FrameSinkManagerImpl.
 class VIZ_SERVICE_EXPORT FrameSinkManagerImpl
     : public SurfaceObserver,
-      public FrameSinkVideoCapturerManager,
+      //public FrameSinkVideoCapturerManager,
       public mojom::FrameSinkManager,
       public HitTestAggregatorDelegate,
       public SurfaceManagerDelegate {
@@ -276,9 +276,9 @@ class VIZ_SERVICE_EXPORT FrameSinkManagerImpl
                                          BeginFrameSource* source);
 
   // FrameSinkVideoCapturerManager implementation:
-  CapturableFrameSink* FindCapturableFrameSink(
+  /*CapturableFrameSink* FindCapturableFrameSink(
       const FrameSinkId& frame_sink_id) override;
-  void OnCapturerConnectionLost(FrameSinkVideoCapturerImpl* capturer) override;
+  void OnCapturerConnectionLost(FrameSinkVideoCapturerImpl* capturer) override;*/
 
   // Returns true if |child framesink| is or has |search_frame_sink_id| as a
   // child.
@@ -338,9 +338,9 @@ class VIZ_SERVICE_EXPORT FrameSinkManagerImpl
   base::flat_map<FrameSinkId, std::unique_ptr<CompositorFrameSinkImpl>>
       sink_map_;
 
-  base::flat_set<std::unique_ptr<FrameSinkVideoCapturerImpl>,
+  /*base::flat_set<std::unique_ptr<FrameSinkVideoCapturerImpl>,
                  base::UniquePtrComparator>
-      video_capturers_;
+      video_capturers_;*/
 
   base::flat_map<uint32_t, base::ScopedClosureRunner> cached_back_buffers_;
 

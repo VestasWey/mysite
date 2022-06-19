@@ -10,7 +10,9 @@
 #include <psapi.h>
 #endif  // OS_WIN
 
-#include <vulkan/vulkan.h>
+//#if BUILDFLAG(ENABLE_VULKAN)
+//#include <vulkan/vulkan.h>
+//#endif
 #include <memory>
 #include <set>
 #include <string>

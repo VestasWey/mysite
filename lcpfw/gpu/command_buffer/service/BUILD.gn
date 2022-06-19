@@ -298,7 +298,7 @@ target(link_target_type, "gles2_sources") {
     "//gpu/command_buffer/common:raster_sources",
     "//gpu/command_buffer/common:webgpu_sources",
     "//skia",
-    #"//third_party/dawn/src/dawn:dawn_headers",
+    "//third_party/dawn/src/dawn:dawn_headers",
   ]
   deps = [
     ":disk_cache_proto",

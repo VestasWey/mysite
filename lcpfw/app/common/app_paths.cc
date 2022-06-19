@@ -157,7 +157,7 @@ namespace lcpfw
                 return false;
             }
 
-            path = path.Append(FILE_PATH_LITERAL("app_100_percent.pak"));
+            path = path.Append(FILE_PATH_LITERAL("lcpfw_100_percent.pak"));
             break;
 
         case lcpfw::DIR_APP_TEMP:
@@ -167,16 +167,6 @@ namespace lcpfw
             }
 
             path = path.Append(kAppTempDirName);
-            create_dir = true;
-            break;
-
-        case lcpfw::DIR_KV_CACHE:
-            if (!GetDefaultUserDataDirectory(&path))
-            {
-                return false;
-            }
-
-            path = path.Append(FILE_PATH_LITERAL("KV Cache"));
             create_dir = true;
             break;
 

@@ -7,7 +7,7 @@
 #include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
 #include "base/sequence_checker.h"
-//#include "components/keep_alive_registry/app_keep_alive_state_observer.h"
+#include "components/keep_alive_registry/app_keep_alive_state_observer.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -25,12 +25,14 @@ class AppMainPartsImpl;
 class AppSecret;
 
 class AppMainProcessImpl
-    : public AppMainProcess/*,
-    public KeepAliveStateObserver*/
+    : public AppMainProcess,
+    public KeepAliveStateObserver
 {
 public:
     static void RegisterGlobalPrefs(PrefRegistrySimple* registry);
     static void RegisterUserPrefs(PrefRegistrySimple* registry);
+
+    void SetMainModule(scoped_refptr<MainModule> main_module);
 
     // Called to complete initialization.
     void Init();
@@ -54,11 +56,14 @@ public:
     bool IsShuttingDown() override;
     void SetApplicationLocale(const std::string& locale) override;
     const std::string& GetApplicationLocale() override;
+    BackgroundModeManager* background_mode_manager() override;
     Profile* global_profile() override;
     Profile* profile() override;
     PrefService* local_state() override;
     PrefService* global_state() override;
-    //StatusTray* status_tray() override;
+    StatusTray* status_tray() override;
+    scoped_refptr<MainModule> main_module() override;
+    CommandController* command_controller() override;
 
 private:
     AppMainProcessImpl(const base::FilePath& user_data_dir);
@@ -85,8 +90,8 @@ private:
     void FlushLocalStateAndReply(base::OnceClosure reply) override;
 
     // KeepAliveStateObserver implementation
-    //void OnKeepAliveStateChanged(bool is_keeping_alive) override;
-    //void OnKeepAliveRestartStateChanged(bool can_restart) override;
+    void OnKeepAliveStateChanged(bool is_keeping_alive) override;
+    void OnKeepAliveRestartStateChanged(bool can_restart) override;
 
     // Methods called to control our lifetime. The browser process can be "pinned"
     // to make sure it keeps running.
@@ -96,13 +101,20 @@ private:
     void InitGlobalProfile();
     void InitLocalProfile();
 
+    void CreateStatusTray();
+    void CreateBackgroundModeManager();
+
     bool LoadSecretModule();
 
 private:
     friend struct std::default_delete<AppMainProcessImpl>;
     friend class AppMainPartsImpl;
 
-    //std::unique_ptr<StatusTray> status_tray_;
+    std::unique_ptr<StatusTray> status_tray_;
+
+    // Must be destroyed after the profile manager, because it doesn't remove
+    // itself as a profile attributes storage observer on destruction.
+    std::unique_ptr<BackgroundModeManager> background_mode_manager_;
 
     bool shutting_down_ = false;
     bool tearing_down_ = false;
@@ -127,6 +139,9 @@ private:
 
     std::unique_ptr<base::ScopedNativeLibrary> secret_dll_;
     scoped_refptr<AppSecret> secret_module_;
+
+    scoped_refptr<MainModule> main_module_;
+    std::unique_ptr<CommandController> cmd_controller_;
 
     SEQUENCE_CHECKER(sequence_checker_);
 

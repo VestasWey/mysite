@@ -7,7 +7,7 @@ import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
 import("//components/viz/viz.gni")
 import("//gpu/vulkan/features.gni")
-import("//media/gpu/args.gni")
+#import("//media/gpu/args.gni")
 import("//skia/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 
@@ -155,16 +155,16 @@ viz_component("service") {
     "frame_sinks/surface_resource_holder.cc",
     "frame_sinks/surface_resource_holder.h",
     "frame_sinks/surface_resource_holder_client.h",
-    "frame_sinks/video_capture/capturable_frame_sink.h",
-    "frame_sinks/video_capture/frame_sink_video_capturer_impl.cc",
-    "frame_sinks/video_capture/frame_sink_video_capturer_impl.h",
-    "frame_sinks/video_capture/frame_sink_video_capturer_manager.h",
-    "frame_sinks/video_capture/in_flight_frame_delivery.cc",
-    "frame_sinks/video_capture/in_flight_frame_delivery.h",
-    "frame_sinks/video_capture/interprocess_frame_pool.cc",
-    "frame_sinks/video_capture/interprocess_frame_pool.h",
-    "frame_sinks/video_capture/video_capture_overlay.cc",
-    "frame_sinks/video_capture/video_capture_overlay.h",
+    #"frame_sinks/video_capture/capturable_frame_sink.h",
+    #"frame_sinks/video_capture/frame_sink_video_capturer_impl.cc",
+    #"frame_sinks/video_capture/frame_sink_video_capturer_impl.h",
+    #"frame_sinks/video_capture/frame_sink_video_capturer_manager.h",
+    #"frame_sinks/video_capture/in_flight_frame_delivery.cc",
+    #"frame_sinks/video_capture/in_flight_frame_delivery.h",
+    #"frame_sinks/video_capture/interprocess_frame_pool.cc",
+    #"frame_sinks/video_capture/interprocess_frame_pool.h",
+    #"frame_sinks/video_capture/video_capture_overlay.cc",
+    #"frame_sinks/video_capture/video_capture_overlay.h",
     "frame_sinks/video_detector.cc",
     "frame_sinks/video_detector.h",
     "hit_test/hit_test_aggregator.cc",
@@ -225,14 +225,14 @@ viz_component("service") {
     "//gpu/ipc/service",
     "//gpu/skia_bindings:skia_bindings",
     "//gpu/vulkan:buildflags",
-    "//media",
-    "//media/capture:capture_lib",
-    "//media/mojo/services",
+    #"//media",
+    #"//media/capture:capture_lib",
+    #"//media/mojo/services",
     "//services/tracing/public/cpp:cpp",
     "//services/viz/privileged/mojom",
     "//skia",
     "//skia:skcms",
-    "//third_party/libyuv",
+    #"//third_party/libyuv",
     "//ui/display/types",
   ]
 
@@ -402,8 +402,8 @@ viz_source_set("gpu_service_dependencies") {
     "//gpu/ipc:gl_in_process_context",
     "//gpu/ipc/service",
     "//gpu/vulkan:buildflags",
-    "//media/gpu/ipc/service",
-    "//media/mojo/services",
+    #"//media/gpu/ipc/service",
+    #"//media/mojo/services",
     "//services/viz/privileged/mojom/gl",
     "//skia",
     "//ui/latency:latency",
@@ -415,7 +415,7 @@ viz_source_set("gpu_service_dependencies") {
     "//base",
     "//build:chromeos_buildflags",
     "//gpu/config",
-    "//third_party/libyuv",
+    #"//third_party/libyuv",
   ]
 
   if (is_win) {
@@ -445,9 +445,9 @@ viz_source_set("gpu_service_dependencies") {
     ]
   }
 
-  if (use_vaapi) {
-    deps += [ "//media/gpu/vaapi" ]
-  }
+  # if (use_vaapi) {
+  #   deps += [ "//media/gpu/vaapi" ]
+  # }
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]

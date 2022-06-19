@@ -265,7 +265,7 @@ std::ostream &FmtHex(std::ostream &os, T value)
                 {                                                                            \
                     scopedPerfEventHelper##__LINE__.begin(                                   \
                         "%s(" message ")", GetEntryPointName(angle::EntryPoint::entryPoint), \
-                        __VA_ARGS__);                                                        \
+                        ##__VA_ARGS__);                                                      \
                 }                                                                            \
             } while (0)
 #    else

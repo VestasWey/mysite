@@ -13,7 +13,7 @@
 #include "base/files/file_util.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
-//#include "components/keep_alive_registry/keep_alive_registry.h"
+#include "components/keep_alive_registry/app_keep_alive_registry.h"
 //#include "components/prefs/json_pref_store.h"
 //#include "net/log/net_log.h"
 
@@ -21,9 +21,13 @@
 #include "common/app_constants.h"
 #include "common/app_pref_names.h"
 #include "content/app_thread.h"
-#include "profiles/main_profile.h"
-#include "public/main/app_notification_types.h"
+#include "main/ui/background_mode_manager.h"
+#include "main/ui/command_controller.h"
+#include "main/ui/main_module.h"
+#include "main/profiles/main_profile.h"
+#include "public/main/notification_types.h"
 #include "secret/app_secret.h"
+#include "ui/views/status_icons/status_tray.h"
 
 
 namespace
@@ -94,7 +98,8 @@ void AppMainProcessImpl::RegisterUserPrefs(PrefRegistrySimple* registry)
 }
 
 AppMainProcessImpl::AppMainProcessImpl(const base::FilePath& user_data_dir)
-    : user_data_dir_(user_data_dir)
+    : user_data_dir_(user_data_dir),
+    cmd_controller_(std::make_unique<CommandController>())
 {
     g_app_process = this;
 }
@@ -104,9 +109,9 @@ AppMainProcessImpl::~AppMainProcessImpl()
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     //tracked_objects::ThreadData::EnsureCleanupWasCalled(4);
 
-//#if !defined(OS_ANDROID)
-//    KeepAliveRegistry::GetInstance()->RemoveObserver(this);
-//#endif
+#if !defined(OS_ANDROID)
+    KeepAliveRegistry::GetInstance()->RemoveObserver(this);
+#endif
 
     g_app_process = nullptr;
 }
@@ -118,8 +123,8 @@ void AppMainProcessImpl::Init()
 #endif
 
 #if !defined(OS_ANDROID)
-    //KeepAliveRegistry::GetInstance()->SetIsShuttingDown(false);
-    //KeepAliveRegistry::GetInstance()->AddObserver(this);
+    KeepAliveRegistry::GetInstance()->SetIsShuttingDown(false);
+    KeepAliveRegistry::GetInstance()->AddObserver(this);
 #endif  // !defined(OS_ANDROID)
 }
 
@@ -135,6 +140,12 @@ void AppMainProcessImpl::ClearQuitClosure() {
     quit_closure_.Reset();
 }
 #endif
+
+void AppMainProcessImpl::SetMainModule(scoped_refptr<MainModule> main_module)
+{
+    main_module_ = main_module;
+    cmd_controller_->SetMainModule(main_module.get());
+}
 
 bool AppMainProcessImpl::IsShuttingDown()
 {
@@ -152,6 +163,14 @@ const std::string& AppMainProcessImpl::GetApplicationLocale()
 {
     DCHECK(!locale_.empty());
     return locale_;
+}
+
+BackgroundModeManager* AppMainProcessImpl::background_mode_manager()
+{
+    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+    if (!background_mode_manager_)
+        CreateBackgroundModeManager();
+    return background_mode_manager_.get();
 }
 
 Profile* AppMainProcessImpl::global_profile()
@@ -188,6 +207,26 @@ PrefService* AppMainProcessImpl::global_state()
     return nullptr;
 }
 
+StatusTray* AppMainProcessImpl::status_tray()
+{
+    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+    if (!status_tray_)
+        CreateStatusTray();
+    return status_tray_.get();
+}
+
+scoped_refptr<MainModule> AppMainProcessImpl::main_module()
+{
+    DCHECK(main_module_);
+    return main_module_;
+}
+
+CommandController* AppMainProcessImpl::command_controller()
+{
+    DCHECK(cmd_controller_);
+    return cmd_controller_.get();
+}
+
 // internal
 void AppMainProcessImpl::PreCreateThreads()
 {
@@ -202,7 +241,6 @@ bool AppMainProcessImpl::PreMainMessageLoopRun()
     }
 
     // 临近开启消息循环，确保UI所需的相关模块在这之前都初始化好了
-    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     return true;
 }
@@ -232,8 +270,7 @@ void AppMainProcessImpl::InitGlobalProfile()
 void AppMainProcessImpl::InitLocalProfile()
 {
     // TODO: auto user_profile_dir = user_data_dir_.Append(user account ID);
-    NOTREACHED();
-    auto user_profile_dir = user_data_dir_.Append(lcpfw::kGlobalProfileDirName);
+    auto user_profile_dir = user_data_dir_.Append(L"vestas.wey");
     if (!base::DirectoryExists(user_profile_dir))
     {
         base::CreateDirectory(user_profile_dir);
@@ -270,7 +307,7 @@ bool AppMainProcessImpl::LoadSecretModule()
         return false;
     }
 
-    SecretModuleEntry entry_point = reinterpret_cast<SecretModuleEntry>(secret_dll_->GetFunctionPointer("AppSecretEntry"));
+    SecretModuleEntry entry_point = reinterpret_cast<SecretModuleEntry>(secret_dll_->GetFunctionPointer("AppModuleEntry"));
     if (!entry_point)
     {
         secret_dll_ = nullptr;
@@ -297,27 +334,27 @@ bool AppMainProcessImpl::LoadSecretModule()
     return true;
 }
 
-//void AppMainProcessImpl::OnKeepAliveStateChanged(bool is_keeping_alive) {
-//    if (is_keeping_alive)
-//        Pin();
-//    else
-//        Unpin();
-//}
-//
-//void AppMainProcessImpl::OnKeepAliveRestartStateChanged(bool can_restart)
-//{
-//}
+void AppMainProcessImpl::OnKeepAliveStateChanged(bool is_keeping_alive) {
+    if (is_keeping_alive)
+        Pin();
+    else
+        Unpin();
+}
+
+void AppMainProcessImpl::OnKeepAliveRestartStateChanged(bool can_restart)
+{
+}
 
 void AppMainProcessImpl::Pin()
 {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     DCHECK(!IsShuttingDown());
 
-    //if (IsShuttingDown()) {
-    //    base::debug::StackTrace callstack = release_last_reference_callstack_;
-    //    base::debug::Alias(&callstack);
-    //    CHECK(false);
-    //}
+    if (IsShuttingDown()) {
+        base::debug::StackTrace callstack = release_last_reference_callstack_;
+        base::debug::Alias(&callstack);
+        CHECK(false);
+    }
 }
 
 void AppMainProcessImpl::Unpin()
@@ -337,7 +374,7 @@ void AppMainProcessImpl::Unpin()
     shutting_down_ = true;
 
 #if !defined(OS_ANDROID)
-    //KeepAliveRegistry::GetInstance()->SetIsShuttingDown();
+    KeepAliveRegistry::GetInstance()->SetIsShuttingDown();
 #endif  // !defined(OS_ANDROID)
 
     DCHECK(base::RunLoop::IsRunningOnCurrentThread());
@@ -356,6 +393,19 @@ void AppMainProcessImpl::Unpin()
 #endif
 }
 
+void AppMainProcessImpl::CreateStatusTray()
+{
+    DCHECK(!status_tray_);
+    status_tray_ = StatusTray::Create();
+}
+
+void AppMainProcessImpl::CreateBackgroundModeManager()
+{
+    DCHECK(!background_mode_manager_);
+    background_mode_manager_ = std::make_unique<BackgroundModeManager>(
+        *base::CommandLine::ForCurrentProcess());
+}
+
 void AppMainProcessImpl::StartTearDown()
 {
     tearing_down_ = true;
@@ -364,11 +414,13 @@ void AppMainProcessImpl::StartTearDown()
     if (global_profile_)
     {
         global_profile_->GetPrefs()->CommitPendingWrite();
+        global_profile_ = nullptr;
     }
 
     if (profile_)
     {
         profile_->GetPrefs()->CommitPendingWrite();
+        profile_ = nullptr;
     }
 
     if (secret_module_)
@@ -376,6 +428,10 @@ void AppMainProcessImpl::StartTearDown()
         secret_module_->Uninitialize();
         secret_module_ = nullptr;
     }
+    secret_dll_ = nullptr;
+
+    cmd_controller_ = nullptr;
+    main_module_ = nullptr;
 }
 
 void AppMainProcessImpl::PostDestroyThreads()

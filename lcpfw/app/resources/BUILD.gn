@@ -1,0 +1,189 @@
+
+import("//tools/grit/grit_rule.gni")
+import("//tools/grit/repack.gni")
+import("//build/util/process_version.gni")
+import("build_resources.gni")
+
+
+# 构建版本信息，过后如果对接CI系统，可以通过CI脚本修改“version/VERSION”中的版本号来决定最终产出的exe、dll等文件的版本信息
+if(is_win) {
+    process_version("app_ver") {
+        template_file = rebase_path("version/win.rc.in")
+        sources = [
+            "version/lcpfw.ver",
+            "version/VERSION",
+            "version/BRANDING",
+            "version/LASTCHANGE",
+        ]
+        # version info
+        # This file is generated during the build, so CI/CD system can change version every builds.
+        output = "$target_gen_dir/win/app_ver.rc"
+    }
+
+    process_version("main_ver") {
+        template_file = rebase_path("version/win.rc.in")
+        sources = [
+            "version/lcpfw_main_dll.ver",
+            "version/VERSION",
+            "version/BRANDING",
+            "version/LASTCHANGE",
+        ]
+        # version info
+        # This file is generated during the build, so CI/CD system can change version every builds.
+        output = "$target_gen_dir/win/main_ver.rc"
+    }
+
+    process_version("secret_ver") {
+        template_file = rebase_path("version/win.rc.in")
+        sources = [
+            "version/lcpfw_secret_dll.ver",
+            "version/VERSION",
+            "version/BRANDING",
+            "version/LASTCHANGE",
+        ]
+        # version info
+        # This file is generated during the build, so CI/CD system can change version every builds.
+        output = "$target_gen_dir/win/secret_ver.rc"
+    }
+}
+
+# 打包自己的资源.pak包
+grit("ui_resources_grd") {
+    visibility = [
+        ":repack_ui_views_pak_100_percent",
+        ":repack_ui_views_pak_150_percent",
+        ":repack_ui_views_pak_200_percent",
+    ]
+    
+    source = "ui_resources.grd"
+    outputs = [
+        "grit/ui_resources.h",
+        "grit/ui_resources_map.cc",
+        "grit/ui_resources_map.h",
+        "app_100_percent.pak",
+        "app_150_percent.pak",
+        "app_200_percent.pak",
+    ]
+
+    # 指定自己的id范围
+    resource_ids = rebase_path("resource_ids")
+}
+
+grit("ui_strings_grd") {
+    source = "ui_strings.grd"
+    outputs = [
+        "grit/ui_strings.h",
+    ]
+
+    foreach(locale, support_locales) {
+        outputs += [ "$locale.pak" ]
+    }
+
+    # 指定自己的id起始值，不要与chromium的重复
+    resource_ids = rebase_path("resource_ids")
+}
+
+# 把自己的资源和chromium的UI库的一些基础资源重新封成一个.pak包，
+# chromium的基础图片资源在“//ui/resources”中，内容包括但不限于：
+#   widget的默认外边框的按钮图片（关闭、最大/小化）
+#   资源管理器的小文件图标等等
+# chromium的字符串资源在“//ui/strings”中，内容包括但不限于：
+#   各种控件的tooltip文案
+#   编辑框的右键菜单项文案
+group("repack_ui_resources") {
+  data_deps = [
+    ":repack_ui_views_pak_100_percent",
+    ":repack_ui_views_pak_150_percent",
+    ":repack_ui_views_pak_200_percent",
+    ":repack_ui_string_locale_pack",
+  ]
+}
+
+repack("repack_ui_views_pak_100_percent") {
+  visibility = [ ":repack_ui_resources" ]
+
+  sources = [
+    "$root_gen_dir/app/resources/app_100_percent.pak",
+    "$root_gen_dir/ui/resources/ui_resources_100_percent.pak",
+  ]
+
+  output = "$root_out_dir/lcpfw_100_percent.pak"
+
+  deps = [
+    "//ui/resources",
+    ":ui_resources_grd",
+  ]
+
+  if (toolkit_views) {
+    deps += [
+        "//ui/views/resources",
+    ]
+    sources +=
+        [ "$root_gen_dir/ui/views/resources/views_resources_100_percent.pak" ]
+  }
+}
+
+repack("repack_ui_views_pak_150_percent") {
+  visibility = [ ":repack_ui_resources" ]
+
+  sources = [
+    "$root_gen_dir/app/resources/app_150_percent.pak",
+    "$root_gen_dir/ui/resources/ui_resources_200_percent.pak",
+  ]
+
+  output = "$root_out_dir/lcpfw_150_percent.pak"
+
+  deps = [
+    "//ui/resources",
+    ":ui_resources_grd",
+  ]
+
+  if (toolkit_views) {
+    deps += [
+        "//ui/views/resources",
+    ]
+    sources +=
+        [ "$root_gen_dir/ui/views/resources/views_resources_200_percent.pak" ]
+  }
+}
+
+repack("repack_ui_views_pak_200_percent") {
+  visibility = [ ":repack_ui_resources" ]
+
+  sources = [
+    "$root_gen_dir/app/resources/app_200_percent.pak",
+    "$root_gen_dir/ui/resources/ui_resources_200_percent.pak",
+  ]
+
+  output = "$root_out_dir/lcpfw_200_percent.pak"
+
+  deps = [
+    "//ui/resources",
+    ":ui_resources_grd",
+  ]
+
+  if (toolkit_views) {
+    deps += [
+        "//ui/views/resources",
+    ]
+    sources +=
+        [ "$root_gen_dir/ui/views/resources/views_resources_200_percent.pak" ]
+  }
+}
+
+repack_locales("repack_ui_string_locale_pack") {
+    visibility = [ ":repack_ui_resources" ]
+
+    input_locales = support_locales
+    output_locales = support_locales
+    source_patterns = [
+        "${root_gen_dir}/ui/strings/ui_strings_",
+        "${root_gen_dir}/app/resources/",
+    ]
+    output_dir = "$root_out_dir/locales"
+
+    deps = [
+        "//ui/strings",
+        ":ui_strings_grd",
+    ]
+}

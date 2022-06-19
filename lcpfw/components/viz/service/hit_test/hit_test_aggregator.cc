@@ -284,7 +284,7 @@ void HitTestAggregator::SetRegionAt(size_t index,
                               child_count, async_hit_test_reasons);
   hit_test_data_size_++;
 
-  hit_test_debug_ |= flags & kHitTestDebug;
+  hit_test_debug_ |= !!(flags & kHitTestDebug);
   if (flags & kHitTestAsk)
     ++hit_test_debug_ask_regions_;
 }

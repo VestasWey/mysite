@@ -980,7 +980,7 @@ ChildLayout AnimatingLayoutManager::CalculateScaleFade(
   trailing_reference_point -= fade_info.offsets.trailing();
 
   const int new_size =
-      std::min(int{scale_percent * fade_info.reference_bounds.size_main()},
+      std::min((int)(scale_percent * fade_info.reference_bounds.size_main()),
                trailing_reference_point - leading_reference_point);
 
   child_layout.child_view = fade_info.child_view;

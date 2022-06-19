@@ -19,7 +19,7 @@
 #include "base/optional.h"
 #include "base/time/time.h"
 #include "components/viz/common/surfaces/frame_sink_id.h"
-#include "components/viz/host/client_frame_sink_video_capturer.h"
+//#include "components/viz/host/client_frame_sink_video_capturer.h"
 #include "components/viz/host/hit_test/hit_test_query.h"
 #include "components/viz/host/hit_test/hit_test_region_observer.h"
 #include "components/viz/host/host_frame_sink_client.h"
@@ -146,19 +146,19 @@ class VIZ_HOST_EXPORT HostFrameSinkManager
   base::Optional<FrameSinkId> FindRootFrameSinkId(
       const FrameSinkId& start) const;
 
-  // Asks viz to send updates regarding video activity to |observer|.
-  void AddVideoDetectorObserver(
-      mojo::PendingRemote<mojom::VideoDetectorObserver> observer);
+  //// Asks viz to send updates regarding video activity to |observer|.
+  //void AddVideoDetectorObserver(
+  //    mojo::PendingRemote<mojom::VideoDetectorObserver> observer);
 
-  // Creates a FrameSinkVideoCapturer instance in viz.
-  void CreateVideoCapturer(
-      mojo::PendingReceiver<mojom::FrameSinkVideoCapturer> receiver);
+  //// Creates a FrameSinkVideoCapturer instance in viz.
+  //void CreateVideoCapturer(
+  //    mojo::PendingReceiver<mojom::FrameSinkVideoCapturer> receiver);
 
-  // Creates a FrameSinkVideoCapturer instance in viz and returns a
-  // ClientFrameSinkVideoCapturer that's connected to it. Clients should prefer
-  // this version because ClientFrameSinkVideoCapturer is resilient to viz
-  // crashes.
-  std::unique_ptr<ClientFrameSinkVideoCapturer> CreateVideoCapturer();
+  //// Creates a FrameSinkVideoCapturer instance in viz and returns a
+  //// ClientFrameSinkVideoCapturer that's connected to it. Clients should prefer
+  //// this version because ClientFrameSinkVideoCapturer is resilient to viz
+  //// crashes.
+  //std::unique_ptr<ClientFrameSinkVideoCapturer> CreateVideoCapturer();
 
   // Marks the given SurfaceIds for destruction.
   void EvictSurfaces(const std::vector<SurfaceId>& surface_ids);

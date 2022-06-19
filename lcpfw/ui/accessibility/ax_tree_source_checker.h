@@ -152,7 +152,7 @@ bool AXTreeSourceChecker<AXSourceNode>::Check(AXSourceNode node,
     if (!tree_->IsValid(child)) {
       std::string msg =
           base::StringPrintf("Node %d has an invalid child (index %d): %s\n",
-                             node_id, int{i}, NodeToString(node).c_str());
+                             node_id, int{(int)i}, NodeToString(node).c_str());
       *output = msg + *output;
       return false;
     }

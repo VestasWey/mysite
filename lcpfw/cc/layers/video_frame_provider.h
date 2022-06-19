@@ -84,7 +84,7 @@ class CC_EXPORT VideoFrameProvider {
   //
   // Clients should call this in response to UpdateCurrentFrame() returning true
   // or in response to a DidReceiveFrame() call.
-  virtual scoped_refptr<media::VideoFrame> GetCurrentFrame() = 0;
+  //virtual scoped_refptr<media::VideoFrame> GetCurrentFrame() = 0;
 
   // Called in response to DidReceiveFrame() or a return value of true from
   // UpdateCurrentFrame() if the current frame was considered for rendering; the

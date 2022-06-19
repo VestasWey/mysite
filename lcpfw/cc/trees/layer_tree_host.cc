@@ -133,7 +133,7 @@ std::unique_ptr<LayerTreeHost> LayerTreeHost::CreateSingleThreaded(
 LayerTreeHost::LayerTreeHost(InitParams params, CompositorMode mode)
     : micro_benchmark_controller_(this),
       image_worker_task_runner_(std::move(params.image_worker_task_runner)),
-      ukm_recorder_factory_(std::move(params.ukm_recorder_factory)),
+      //ukm_recorder_factory_(std::move(params.ukm_recorder_factory)),
       compositor_mode_(mode),
       ui_resource_manager_(std::make_unique<UIResourceManager>()),
       client_(params.client),
@@ -552,7 +552,8 @@ std::unique_ptr<LayerTreeHostImpl> LayerTreeHost::CreateLayerTreeHostImpl(
       std::move(mutator_host_impl), dark_mode_filter_, id_,
       std::move(image_worker_task_runner_), scheduling_client_);
   if (ukm_recorder_factory_) {
-    host_impl->InitializeUkm(ukm_recorder_factory_->CreateRecorder());
+      NOTREACHED();
+    host_impl->InitializeUkm(/*ukm_recorder_factory_->CreateRecorder()*/);
     ukm_recorder_factory_.reset();
   }
 

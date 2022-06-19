@@ -1797,29 +1797,29 @@ proto_library("net_nqe_proto") {
   extra_configs = [ "//build/config/compiler:wexit_time_destructors" ]
 }
 
-# component("extras") {
-#   sources = [
-#     "extras/sqlite/cookie_crypto_delegate.h",
-#     "extras/sqlite/sqlite_persistent_cookie_store.cc",
-#     "extras/sqlite/sqlite_persistent_cookie_store.h",
-#     "extras/sqlite/sqlite_persistent_store_backend_base.cc",
-#     "extras/sqlite/sqlite_persistent_store_backend_base.h",
-#   ]
-#   defines = [ "IS_NET_EXTRAS_IMPL" ]
-#   configs += [ "//build/config/compiler:wexit_time_destructors" ]
-#   deps = [
-#     ":net",
-#     "//base",
-#     "//sql:sql",
-#   ]
+component("extras") {
+  sources = [
+    "extras/sqlite/cookie_crypto_delegate.h",
+    "extras/sqlite/sqlite_persistent_cookie_store.cc",
+    "extras/sqlite/sqlite_persistent_cookie_store.h",
+    "extras/sqlite/sqlite_persistent_store_backend_base.cc",
+    "extras/sqlite/sqlite_persistent_store_backend_base.h",
+  ]
+  defines = [ "IS_NET_EXTRAS_IMPL" ]
+  configs += [ "//build/config/compiler:wexit_time_destructors" ]
+  deps = [
+    ":net",
+    "//base",
+    "//sql:sql",
+  ]
 
-#   if (enable_reporting) {
-#     sources += [
-#       "extras/sqlite/sqlite_persistent_reporting_and_nel_store.cc",
-#       "extras/sqlite/sqlite_persistent_reporting_and_nel_store.h",
-#     ]
-#   }
-# }
+  if (enable_reporting) {
+    sources += [
+      "extras/sqlite/sqlite_persistent_reporting_and_nel_store.cc",
+      "extras/sqlite/sqlite_persistent_reporting_and_nel_store.h",
+    ]
+  }
+}
 
 static_library("preload_decoder") {
   sources = [

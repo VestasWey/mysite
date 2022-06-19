@@ -42,7 +42,7 @@
 #include "gpu/ipc/common/gpu_surface_lookup.h"
 #include "gpu/vulkan/buildflags.h"
 #include "skia/buildflags.h"
-#include "third_party/libyuv/include/libyuv/planar_functions.h"
+//#include "third_party/libyuv/include/libyuv/planar_functions.h"
 #include "third_party/skia/include/core/SkDeferredDisplayList.h"
 #include "ui/gfx/color_space.h"
 #include "ui/gfx/geometry/rect_conversions.h"
@@ -273,7 +273,7 @@ class SkiaOutputSurfaceImplOnGpu::CopyOutputResultYUV
     if (!result_)
       return false;
 
-    auto* data0 = static_cast<const uint8_t*>(result_->data(0));
+    /*auto* data0 = static_cast<const uint8_t*>(result_->data(0));
     auto* data1 = static_cast<const uint8_t*>(result_->data(1));
     auto* data2 = static_cast<const uint8_t*>(result_->data(2));
     libyuv::CopyPlane(data0, result_->rowBytes(0), y_out, y_out_stride,
@@ -281,7 +281,8 @@ class SkiaOutputSurfaceImplOnGpu::CopyOutputResultYUV
     libyuv::CopyPlane(data1, result_->rowBytes(1), u_out, u_out_stride,
                       width(1), height(1));
     libyuv::CopyPlane(data2, result_->rowBytes(2), v_out, v_out_stride,
-                      width(2), height(2));
+                      width(2), height(2));*/
+    NOTREACHED();
     return true;
   }
 
@@ -793,10 +794,9 @@ void SkiaOutputSurfaceImplOnGpu::FinishPaintRenderPass(
     offscreen.surface()->draw(ddl);
     destroy_after_swap_.emplace_back(std::move(ddl));
 
-    GrFlushInfo flush_info = {
-        .fNumSemaphores = end_semaphores.size(),
-        .fSignalSemaphores = end_semaphores.data(),
-    };
+    GrFlushInfo flush_info = { 0 };
+    flush_info.fNumSemaphores = (int)end_semaphores.size();
+    flush_info.fSignalSemaphores = end_semaphores.data();
     gpu::AddVulkanCleanupTaskForSkiaFlush(vulkan_context_provider_,
                                           &flush_info);
     if (on_finished)

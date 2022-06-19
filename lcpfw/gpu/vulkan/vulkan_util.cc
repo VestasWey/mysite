@@ -105,7 +105,7 @@ std::string VkVersionToString(uint32_t version) {
                             VK_VERSION_PATCH(version));
 }
 
-VkResult QueueSubmitHook(VkQueue queue,
+VkResult VKAPI_CALL QueueSubmitHook(VkQueue queue,
                          uint32_t submitCount,
                          const VkSubmitInfo* pSubmits,
                          VkFence fence) {
@@ -113,7 +113,7 @@ VkResult QueueSubmitHook(VkQueue queue,
   return vkQueueSubmit(queue, submitCount, pSubmits, fence);
 }
 
-VkResult CreateGraphicsPipelinesHook(
+VkResult VKAPI_CALL CreateGraphicsPipelinesHook(
     VkDevice device,
     VkPipelineCache pipelineCache,
     uint32_t createInfoCount,

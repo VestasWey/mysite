@@ -66,9 +66,9 @@ class VIZ_HOST_EXPORT GpuClient : public mojom::GpuMemoryBufferFactory,
       mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
           jda_receiver) override;
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
-  void CreateVideoEncodeAcceleratorProvider(
+  /*void CreateVideoEncodeAcceleratorProvider(
       mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
-          vea_provider_receiver) override;
+          vea_provider_receiver) override;*/
 
  private:
   enum class ErrorReason {

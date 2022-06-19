@@ -4,7 +4,7 @@
 
 import("//mojo/public/tools/bindings/mojom.gni")
 
-# mojom("mojom") {
-#   generate_java = false
-#   sources = [ "drag_drop_types.mojom" ]
-# }
+mojom("mojom") {
+  generate_java = false
+  sources = [ "drag_drop_types.mojom" ]
+}

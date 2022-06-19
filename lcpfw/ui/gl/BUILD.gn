@@ -447,6 +447,57 @@ if (is_mac && use_egl) {
   }
 }
 
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "test/gl_image_bind_test_template.h",
+    "test/gl_image_test_support.cc",
+    "test/gl_image_test_support.h",
+    "test/gl_image_test_template.cc",
+    "test/gl_image_test_template.h",
+    "test/gl_image_zero_initialize_test_template.h",
+    "test/gl_surface_test_support.cc",
+    "test/gl_surface_test_support.h",
+    "test/gl_test_helper.cc",
+    "test/gl_test_helper.h",
+  ]
+
+  configs += [ "//third_party/khronos:khronos_headers" ]
+
+  public_deps = [
+    ":gl",
+    "//ui/gl/init",
+  ]
+  deps = [
+    "//base/test:test_support",
+    #"//testing/gtest",
+    "//ui/base",
+  ]
+
+  if (is_linux || is_chromeos) {
+    deps += [ "//ui/platform_window/common" ]
+  }
+
+  if (use_x11) {
+    deps += [
+      "//ui/gfx/x",
+      "//ui/platform_window/x11",
+    ]
+  }
+
+  if (use_ozone) {
+    deps += [ "//ui/ozone" ]
+  }
+
+  # If the run-time search path isn't set properly when we use ANGLE with its
+  # Vulkan backend, it may end up finding the system libvulkan.so rather than
+  # the one built in the output directory
+  if ((is_linux || is_chromeos) && !is_component_build) {
+    all_dependent_configs =
+        [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
+  }
+}
+
 if (is_android) {
   generate_jar_jni("surface_jni_headers") {
     classes = [ "android/view/Surface.class" ]

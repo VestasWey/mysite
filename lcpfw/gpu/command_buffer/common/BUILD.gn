@@ -197,7 +197,7 @@ source_set("webgpu_sources") {
 
   public_deps = [
     ":common",
-    #"//third_party/dawn/src/dawn_wire:dawn_wire_headers",
+    "//third_party/dawn/src/dawn_wire:dawn_wire_headers",
     "//ui/gl:buildflags",
   ]
 }

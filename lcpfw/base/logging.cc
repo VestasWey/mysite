@@ -348,6 +348,16 @@ void CloseLogFileUnlocked() {
     g_logging_destination &= ~LOG_TO_FILE;
 }
 
+// modify [
+void FlushLogFileUnlocked()
+{
+    if (!g_log_file)
+        return;
+
+    ::FlushFileBuffers(g_log_file);
+}
+// ]
+
 }  // namespace
 
 #if defined(DCHECK_IS_CONFIGURABLE)
@@ -1038,6 +1048,16 @@ void CloseLogFile() {
 #endif
   CloseLogFileUnlocked();
 }
+
+// modify [
+void FlushLogFile()
+{
+#if defined(OS_POSIX) || defined(OS_FUCHSIA)
+    base::AutoLock guard(GetLoggingLock());
+#endif
+    FlushLogFileUnlocked();
+}
+// ]
 
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 FILE* DuplicateLogFILE() {

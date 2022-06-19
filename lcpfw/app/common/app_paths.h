@@ -20,11 +20,10 @@ enum {
     DIR_DEFAULT_DOWNLOADS_SAFE, // Directory for a user's "My Documents/Downloads", (Windows) or
     DIR_DEFAULT_DOWNLOADS, // Directory for a user's downloads.
     DIR_APP_UPDATE, // Directory containing application update related files (such as an installer).
-    DIR_UPDATE_REPORT, // Directory containing application update related files (such as an installer).
+    DIR_UPDATE_REPORT, // Directory containing application updated flag files (such as an empty file named UpdateRun).
     FILE_RESOURCE_MODULE, // Full path and filename of the module that
     FILE_RESOURCES_PACK, // Full path to the .pak file containing
     DIR_APP_TEMP, // Directory for app temporary.
-    DIR_KV_CACHE, // Directory for kv resource.
 
     PATH_END
 };

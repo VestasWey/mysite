@@ -15,7 +15,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/sequence_checker.h"
 #include "components/viz/service/viz_service_export.h"
-#include "media/base/video_types.h"
+//#include "media/base/video_types.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "services/viz/privileged/mojom/compositing/frame_sink_video_capture.mojom.h"

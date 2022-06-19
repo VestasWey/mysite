@@ -120,7 +120,7 @@ class CC_EXPORT LayerTreeHost : public MutatorHostClient {
     // raster worker threads.
     scoped_refptr<base::SequencedTaskRunner> image_worker_task_runner;
 
-    std::unique_ptr<UkmRecorderFactory> ukm_recorder_factory;
+    //std::unique_ptr<UkmRecorderFactory> ukm_recorder_factory;
   };
 
   // Constructs a LayerTreeHost with a compositor thread where scrolling and

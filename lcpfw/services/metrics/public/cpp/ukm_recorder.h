@@ -14,7 +14,7 @@
 #include "services/metrics/public/cpp/metrics_export.h"
 #include "services/metrics/public/cpp/ukm_source.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
-//#include "services/metrics/public/mojom/ukm_interface.mojom-forward.h"
+#include "services/metrics/public/mojom/ukm_interface.mojom-forward.h"
 #include "url/gurl.h"
 
 class PermissionUmaUtil;
@@ -73,7 +73,7 @@ class METRICS_EXPORT UkmRecorder {
   static SourceId GetNewSourceID();
 
   // Add an entry to the UkmEntry list.
-  //virtual void AddEntry(mojom::UkmEntryPtr entry) = 0;
+  virtual void AddEntry(mojom::UkmEntryPtr entry) = 0;
 
   // Disables sampling for testing purposes.
   virtual void DisableSamplingForTesting() {}

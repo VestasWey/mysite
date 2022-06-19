@@ -116,3 +116,115 @@ component("compositor") {
     deps += [ "//ui/resources" ]
   }
 }
+
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "test/animation_throughput_reporter_test_base.cc",
+    "test/animation_throughput_reporter_test_base.h",
+    "test/direct_layer_tree_frame_sink.cc",
+    "test/direct_layer_tree_frame_sink.h",
+    "test/draw_waiter_for_test.cc",
+    "test/draw_waiter_for_test.h",
+    "test/fake_context_factory.cc",
+    "test/fake_context_factory.h",
+    "test/in_process_context_factory.cc",
+    "test/in_process_context_factory.h",
+    "test/in_process_context_provider.cc",
+    "test/in_process_context_provider.h",
+    "test/layer_animation_observer_test_api.cc",
+    "test/layer_animation_observer_test_api.h",
+    "test/layer_animator_test_controller.cc",
+    "test/layer_animator_test_controller.h",
+    "test/multi_layer_animator_test_controller.cc",
+    "test/multi_layer_animator_test_controller.h",
+    "test/multi_layer_animator_test_controller_delegate.h",
+    "test/test_compositor_host.h",
+    "test/test_context_factories.cc",
+    "test/test_context_factories.h",
+    "test/test_layer_animation_delegate.cc",
+    "test/test_layer_animation_delegate.h",
+    "test/test_layer_animation_observer.cc",
+    "test/test_layer_animation_observer.h",
+    "test/test_layers.cc",
+    "test/test_layers.h",
+    "test/test_suite.cc",
+    "test/test_suite.h",
+    "test/test_utils.cc",
+    "test/test_utils.h",
+    "test/throughput_report_checker.cc",
+    "test/throughput_report_checker.h",
+  ]
+
+  if (is_android) {
+    sources += [ "test/test_compositor_host_android.cc" ]
+  }
+
+  if (is_mac) {
+    sources += [ "test/test_compositor_host_mac.mm" ]
+  }
+
+  if (is_win) {
+    sources += [ "test/test_compositor_host_win.cc" ]
+  }
+
+  public_deps = [ ":compositor" ]
+  deps = [
+    "//base/test:test_support",
+    "//build:chromeos_buildflags",
+    "//cc",
+    "//cc:test_support",
+    "//components/viz/host",
+    "//components/viz/service",
+    "//components/viz/test:test_support",
+    "//gpu/command_buffer/client:gles2_implementation",
+    "//gpu/command_buffer/client:raster",
+    "//gpu/command_buffer/common",
+    "//gpu/ipc:gl_in_process_context",
+    "//gpu/skia_bindings",
+    "//skia",
+    "//testing/gtest",
+    "//ui/base",
+    "//ui/display",
+    "//ui/gfx",
+    "//ui/gfx/geometry",
+    "//ui/gl:test_support",
+  ]
+
+  if (use_x11) {
+    deps += [
+      "//ui/events/x",
+      "//ui/gfx/x",
+    ]
+  }
+
+  if (is_mac) {
+    deps += [
+      "//gpu/ipc/service:service",
+      "//ui/accelerated_widget_mac",
+    ]
+  }
+
+  if (use_ozone) {
+    sources += [
+      "test/test_compositor_host_ozone.cc",
+      "test/test_compositor_host_ozone.h",
+    ]
+
+    deps += [
+      "//ui/ozone",
+      "//ui/platform_window",
+    ]
+  }
+
+  if (use_x11) {
+    sources += [
+      "test/test_compositor_host_x11.cc",
+      "test/test_compositor_host_x11.h",
+    ]
+  }
+
+  if (is_linux || is_chromeos) {
+    sources += [ "test/test_compositor_host_linux.cc" ]
+  }
+}

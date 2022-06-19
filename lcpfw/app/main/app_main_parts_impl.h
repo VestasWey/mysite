@@ -11,8 +11,13 @@
 #include "main/app_main_process_impl.h"
 #include "main/app_single_instance_guarantor.h"
 #include "common/profiles/profile.h"
-//#include "main/ui/startup/startup_app_creator.h"
 
+class StartupMainCreator;
+class CrashHandlerClient;
+
+namespace content {
+    class NotificationService;
+}
 
 class AppMainPartsImpl final
     : public AppMainParts
@@ -77,12 +82,16 @@ private:
     // it is destroyed last.
     //std::unique_ptr<ShutdownWatcherHelper> shutdown_watcher_;
 
+    std::unique_ptr<CrashHandlerClient> crash_handler_client_;
+
+    std::unique_ptr<content::NotificationService> ntf_service_;
+
     std::vector<std::unique_ptr<AppMainExtraParts>> app_extra_parts_;
 
     std::unique_ptr<AppMainProcessImpl> app_process_;
 
     // Browser creation happens on the Java side in Android.
-    //std::unique_ptr<StartupAppCreator> app_creator_;
+    std::unique_ptr<StartupMainCreator> app_creator_;
 
     // Android doesn't support multiple browser processes, so it doesn't implement
     // ProcessSingleton.

@@ -165,7 +165,7 @@ bool FocusManager::RotatePaneFocus(Direction direction,
   // is initially focused.
   if (panes.empty())
     return false;
-  int count = int{panes.size()};
+  int count = int{ (int)panes.size()};
 
   // Initialize |index| to an appropriate starting index if nothing is
   // focused initially.

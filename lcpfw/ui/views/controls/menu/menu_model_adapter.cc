@@ -134,7 +134,7 @@ MenuItemView* MenuModelAdapter::AppendMenuItemFromModel(ui::MenuModel* model,
                                                         MenuItemView* menu,
                                                         int item_id) {
   const int menu_index =
-      menu->HasSubmenu() ? int{menu->GetSubmenu()->children().size()} : 0;
+      menu->HasSubmenu() ? int{(int)menu->GetSubmenu()->children().size()} : 0;
   return AddMenuItemFromModelAt(model, model_index, menu, menu_index, item_id);
 }
 

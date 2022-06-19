@@ -889,3 +889,186 @@ component("views") {
     deps += [ "//ui/ozone" ]
   }
 }
+
+source_set("test_support") {
+  testonly = true
+  sources = [
+    "animation/test/flood_fill_ink_drop_ripple_test_api.cc",
+    "animation/test/flood_fill_ink_drop_ripple_test_api.h",
+    "animation/test/ink_drop_highlight_test_api.cc",
+    "animation/test/ink_drop_highlight_test_api.h",
+    "animation/test/ink_drop_host_view_test_api.cc",
+    "animation/test/ink_drop_host_view_test_api.h",
+    "animation/test/ink_drop_impl_test_api.cc",
+    "animation/test/ink_drop_impl_test_api.h",
+    "animation/test/ink_drop_ripple_test_api.cc",
+    "animation/test/ink_drop_ripple_test_api.h",
+    "animation/test/ink_drop_utils.cc",
+    "animation/test/square_ink_drop_ripple_test_api.cc",
+    "animation/test/square_ink_drop_ripple_test_api.h",
+    "animation/test/test_ink_drop.cc",
+    "animation/test/test_ink_drop.h",
+    "animation/test/test_ink_drop_animation_observer_helper.h",
+    "animation/test/test_ink_drop_highlight_observer.cc",
+    "animation/test/test_ink_drop_highlight_observer.h",
+    "animation/test/test_ink_drop_host.cc",
+    "animation/test/test_ink_drop_host.h",
+    "animation/test/test_ink_drop_ripple_observer.cc",
+    "animation/test/test_ink_drop_ripple_observer.h",
+    "controls/textfield/textfield_test_api.cc",
+    "controls/textfield/textfield_test_api.h",
+    "layout/animating_layout_manager_test_util.cc",
+    "layout/animating_layout_manager_test_util.h",
+    "test/ax_event_counter.cc",
+    "test/ax_event_counter.h",
+    "test/button_test_api.cc",
+    "test/button_test_api.h",
+    "test/capture_tracking_view.cc",
+    "test/capture_tracking_view.h",
+    "test/combobox_test_api.cc",
+    "test/combobox_test_api.h",
+    "test/desktop_test_views_delegate.h",
+    "test/dialog_test.cc",
+    "test/dialog_test.h",
+    "test/focus_manager_test.cc",
+    "test/focus_manager_test.h",
+    "test/layout_test_utils.cc",
+    "test/menu_runner_test_api.cc",
+    "test/menu_runner_test_api.h",
+    "test/menu_test_utils.cc",
+    "test/menu_test_utils.h",
+    "test/native_widget_factory.cc",
+    "test/native_widget_factory.h",
+    "test/scoped_views_test_helper.cc",
+    "test/scoped_views_test_helper.h",
+    "test/slider_test_api.cc",
+    "test/slider_test_api.h",
+    "test/test_layout_manager.cc",
+    "test/test_layout_manager.h",
+    "test/test_layout_provider.cc",
+    "test/test_layout_provider.h",
+    "test/test_platform_native_widget.h",
+    "test/test_views.cc",
+    "test/test_views.h",
+    "test/test_views_delegate.h",
+    "test/test_widget_observer.cc",
+    "test/test_widget_observer.h",
+    "test/view_metadata_test_utils.cc",
+    "test/view_metadata_test_utils.h",
+    "test/views_drawing_test_utils.cc",
+    "test/views_drawing_test_utils.h",
+    "test/views_test_base.cc",
+    "test/views_test_base.h",
+    "test/views_test_helper.cc",
+    "test/views_test_helper.h",
+    "test/widget_test.cc",
+    "test/widget_test.h",
+    "test/widget_test_api.cc",
+    "test/widget_test_api.h",
+    "view_test_api.h",
+    "views_test_suite.cc",
+    "views_test_suite.h",
+  ]
+
+  if (is_mac) {
+    sources += [
+      "test/desktop_test_views_delegate_mac.mm",
+      "test/event_generator_delegate_mac.h",
+      "test/event_generator_delegate_mac.mm",
+      "test/scoped_views_test_helper_cocoa.mm",
+      "test/test_views_delegate_mac.mm",
+      "test/views_test_base_mac.mm",
+      "test/views_test_helper_mac.h",
+      "test/views_test_helper_mac.mm",
+      "test/widget_test_mac.mm",
+    ]
+  }
+
+  configs += [ "//build/config:precompiled_headers" ]
+
+  deps = [
+    ":views",
+    "//base",
+    "//base/test:test_support",
+    "//build:chromeos_buildflags",
+    "//gpu/ipc/service",
+    "//ipc:test_support",
+    "//mojo/core/embedder",
+    "//skia",
+    "//ui/base",
+    "//ui/base:test_support",
+    "//ui/base/clipboard:clipboard_test_support",
+    "//ui/base/dragdrop/mojom",
+    "//ui/base/ime/init",
+    "//ui/compositor",
+    "//ui/compositor:test_support",
+    "//ui/events",
+    "//ui/events:events_base",
+    "//ui/events:test_support",
+    "//ui/events/platform",
+    "//ui/gfx",
+    "//ui/gfx/geometry",
+    "//ui/gl:test_support",
+  ]
+  #public_deps = [ "//testing/gtest" ]
+
+  if (is_win) {
+    sources += [
+      "test/desktop_window_tree_host_win_test_api.cc",
+      "test/desktop_window_tree_host_win_test_api.h",
+    ]
+  }
+  if (is_mac) {
+    deps += [ "//components/remote_cocoa/app_shim" ]
+  }
+
+  if (use_aura) {
+    sources += [
+      "corewm/test/tooltip_aura_test_api.cc",
+      "corewm/test/tooltip_aura_test_api.h",
+      "corewm/tooltip_controller_test_helper.cc",
+      "corewm/tooltip_controller_test_helper.h",
+      "test/desktop_test_views_delegate_aura.cc",
+      "test/test_views_delegate_aura.cc",
+      "test/views_test_helper_aura.cc",
+      "test/views_test_helper_aura.h",
+      "test/widget_test_aura.cc",
+    ]
+    deps += [
+      "//ui/accessibility",
+      "//ui/aura",
+      "//ui/aura:test_support",
+      "//ui/wm",
+      "//ui/wm/public",
+    ]
+    if (use_x11) {
+      sources += [
+        "test/test_desktop_screen_x11.cc",
+        "test/test_desktop_screen_x11.h",
+        "test/ui_controls_factory_desktop_aurax11.cc",
+        "test/ui_controls_factory_desktop_aurax11.h",
+      ]
+      deps += [ "//ui/base/x:test_support" ]
+    }
+  }
+  if (use_x11) {
+    deps += [
+      "//ui/events/platform/x11",
+      "//ui/events/x",
+      "//ui/gfx/x",
+    ]
+  }
+  if (use_ozone) {
+    deps += [ "//ui/ozone" ]
+  }
+
+  if (use_ozone && (is_linux || is_chromeos_lacros) && enable_desktop_aura) {
+    sources += [
+      "test/test_desktop_screen_ozone.cc",
+      "test/test_desktop_screen_ozone.h",
+      "test/ui_controls_factory_desktop_aura_ozone.cc",
+      "test/ui_controls_factory_desktop_aura_ozone.h",
+    ]
+    deps += [ "//ui/ozone:ui_test_support" ]
+  }
+}

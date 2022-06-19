@@ -74,11 +74,34 @@ struct BaseTypeConverter {
   static const char* PropertyNamePrefix() { return name_prefix; }
 };
 
+/*
+TypeConverter 模板的公共版本的原始代码仅提供了模板函数声明，并未提供函数默认实现：
+    static base::string16 ToString(ArgType<T> source_value);
+    static base::Optional<T> FromString(const base::string16& source_value);
+    static ValidStrings GetValidStrings();
+“ui\views\metadata\property_metadata.h”中的ObjectPropertyMetaData通过判断其模板参数的
+（!TypeConverter<T>::kTypeIsSerializable  || TypeConverter<T>::kTypeIsReadOnly）条件是否成立
+来决定是否需要调用TypeConverter<T>::ToString/FromString/GetValidStrings()，
+当处于release模式下（编译优化/O2）时，ObjectPropertyMetaData判断条件不成立则编译器直接不生成对TypeConverter<T>函数的调用代码；
+当处于debug模式下（编译优化关闭/Od）时，不管条件是否成立编译器都会为各判断分支生成对TypeConverter<T>函数的调用代码，即便改代码永远不会执行，
+这就导致debug模式下在程序链接时会提示“在ObjectPropertyMetaData中调用了未定义的TypeConverter<T>函数”。
+为解决这个问题，将TypeConverter<T>的公共版本改为_DEBUG下类函数提供默认的实现：
+    static base::string16 ToString(ArgType<T> source_value) { return {}; }
+    static base::Optional<T> FromString(const base::string16& source_value) { return base::nullopt; }
+    static ValidStrings GetValidStrings() { return {}; }
+这样，在不修改debug的优化选项的情况下不影响程序的链接，在release模式下也不改变原始代码的逻辑。
+*/
 template <typename T>
 struct TypeConverter : BaseTypeConverter<std::is_enum<T>::value> {
+#if NDEBUG
   static base::string16 ToString(ArgType<T> source_value);
   static base::Optional<T> FromString(const base::string16& source_value);
   static ValidStrings GetValidStrings();
+#else
+    static base::string16 ToString(ArgType<T> source_value) { return {}; }
+    static base::Optional<T> FromString(const base::string16& source_value) { return base::nullopt; }
+    static ValidStrings GetValidStrings() { return {}; }
+#endif
 };
 
 // The following definitions and macros are needed only in cases where a type

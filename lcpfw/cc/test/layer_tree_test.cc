@@ -31,7 +31,7 @@
 #include "cc/test/fake_compositor_frame_reporting_controller.h"
 #include "cc/test/fake_layer_tree_host_client.h"
 #include "cc/test/test_layer_tree_frame_sink.h"
-#include "cc/test/test_ukm_recorder_factory.h"
+//#include "cc/test/test_ukm_recorder_factory.h"
 #include "cc/trees/layer_tree_host_client.h"
 #include "cc/trees/layer_tree_host_impl.h"
 #include "cc/trees/layer_tree_host_single_thread_client.h"
@@ -39,7 +39,7 @@
 #include "cc/trees/proxy_impl.h"
 #include "cc/trees/proxy_main.h"
 #include "cc/trees/single_thread_proxy.h"
-#include "components/ukm/test_ukm_recorder.h"
+//#include "components/ukm/test_ukm_recorder.h"
 #include "components/viz/common/frame_timing_details.h"
 #include "components/viz/service/display/display_compositor_memory_and_task_controller.h"
 #include "components/viz/service/display/skia_output_surface.h"
@@ -510,7 +510,7 @@ class LayerTreeHostForTesting : public LayerTreeHost {
     params.settings = &settings;
     params.mutator_host = mutator_host;
     params.image_worker_task_runner = std::move(image_worker_task_runner);
-    params.ukm_recorder_factory = std::make_unique<TestUkmRecorderFactory>();
+    //params.ukm_recorder_factory = std::make_unique<TestUkmRecorderFactory>();
 
     auto layer_tree_host = base::WrapUnique(
         new LayerTreeHostForTesting(test_hooks, std::move(params), mode));
@@ -542,7 +542,7 @@ class LayerTreeHostForTesting : public LayerTreeHost {
             GetTaskRunnerProvider(), task_graph_runner(),
             rendering_stats_instrumentation(), image_worker_task_runner_);
 
-    host_impl->InitializeUkm(ukm_recorder_factory_->CreateRecorder());
+    host_impl->InitializeUkm(/*ukm_recorder_factory_->CreateRecorder()*/);
     compositor_delegate_weak_ptr_ = host_impl->AsWeakPtr();
 
     // Many tests using this class are specifically meant as input tests so

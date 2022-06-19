@@ -57,7 +57,13 @@ void Hang() {
     base::debug::Alias(&do_not_delete_me);
     ++do_not_delete_me;
 
+#ifdef __clang__
     __asm__ volatile("");
+#else
+    /*__asm __volatile {
+        ""
+    };*/
+#endif
   }
 }
 

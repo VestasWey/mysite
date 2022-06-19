@@ -81,7 +81,8 @@ void InfoCollectionGpuServiceImpl::GetGpuSupportedVulkanVersionInfoOnMain(
     GetGpuSupportedVulkanVersionInfoCallback callback) {
   DCHECK(main_runner_->BelongsToCurrentThread());
 
-  uint32_t vulkan_version = gpu::GetGpuSupportedVulkanVersion(gpu_device_);
+  //uint32_t vulkan_version = gpu::GetGpuSupportedVulkanVersion(gpu_device_);
+  uint32_t vulkan_version = 0;
   io_runner_->PostTask(FROM_HERE,
                        base::BindOnce(std::move(callback), vulkan_version));
 }

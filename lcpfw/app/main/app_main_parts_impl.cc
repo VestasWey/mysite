@@ -1,16 +1,7 @@
 #include "main/app_main_parts_impl.h"
 
 #ifdef OS_WIN
-//#include <atlcomcli.h>
-//#include <dxgi.h>
-
 #include "base/win/windows_version.h"
-//#include "ui/base/l10n/l10n_util_win.h"
-//#include "ui/base/resource/resource_bundle_win.h"
-//#include "base/trace_event/trace_event_etw_export_win.h"
-
-//#include "main/win/app_select_file_dialog_factory.h"
-
 #endif
 
 #include "base/files/file_util.h"
@@ -20,19 +11,18 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/system/sys_info.h"
 #include "base/task/current_thread.h"
-//#include "components/device_event_log/device_event_log.h"
-//#include "components/prefs/pref_service.h"
-//
-//#include "ui/base/l10n/l10n_util.h"
-//#include "ui/base/resource/resource_bundle.h"
-//#include "ui/views/focus/accelerator_handler.h"
 
-//#include "app/app/ui/examples/examples_runner.h"
 #include "common/app_context.h"
+#include "common/app_crash_helper.h"
 #include "common/app_paths.h"
 #include "common/app_pref_names.h"
 #include "common/app_result_codes.h"
 #include "main/app_main_extra_parts_views.h"
+#include "main/ui/login/login_window.h"
+#include "main/ui/startup_main_creator.h"
+#include "main/ui/background_mode_manager.h"
+#include "content/public/notification/notification_service.h"
+#include "crash_handler/crash_handler_client.h"
 
 
 
@@ -99,6 +89,17 @@ AppMainPartsImpl::~AppMainPartsImpl()
 
 int AppMainPartsImpl::PreEarlyInitialization()
 {
+    // Set crash handler as soon as possible.
+    // When google_breakpad::ExceptionHandler instance create, it will connect to google_breakpad::CrashGenerationServer via pipe(on windows),
+    // if connect failed, when app crashed, .dmp file will create by current process and Watcher process can't notify user via google_breakpad::CrashGenerationServer,
+    // so that it can't show the feedback dialog. So we should wait the Watcher process ready for it's google_breakpad::CrashGenerationServer instance create success.
+    bool wait_result = WaitForCrashServerReady();
+    if (!wait_result) {
+        LOG(WARNING) << "Failed to bind with crash server; Turn into in-process mode";
+    }
+    crash_handler_client_ = std::make_unique<CrashHandlerClient>();
+    crash_handler_client_->Install();
+
     for (size_t i = 0; i < app_extra_parts_.size(); ++i)
     {
         app_extra_parts_[i]->PreEarlyInitialization();
@@ -126,6 +127,8 @@ void AppMainPartsImpl::PostEarlyInitialization()
 
 void AppMainPartsImpl::ToolkitInitialized()
 {
+    ntf_service_.reset(content::NotificationService::Create());
+
     for (size_t i = 0; i < app_extra_parts_.size(); ++i)
     {
         app_extra_parts_[i]->ToolkitInitialized();
@@ -191,7 +194,7 @@ int AppMainPartsImpl::PreCreateThreadsImpl()
 
     // These members must be initialized before returning from this function.
     // Android doesn't use StartupBrowserCreator.
-    //app_creator_.reset(new StartupAppCreator);
+    app_creator_.reset(new StartupMainCreator(app_process_.get()));
 
 #if defined(OS_WIN)
     // This is needed to enable ETW exporting. This is only relevant for the
@@ -274,19 +277,13 @@ void AppMainPartsImpl::PreAppStart()
 
 void AppMainPartsImpl::AppStart()
 {
-    //int result_code;
-    //if (app_creator_->Start(parsed_command_line(), user_data_dir_, &result_code))
-    //{
-    //    // Transfer ownership of the browser's lifetime to the BrowserProcess.
-    //    app_process_->SetQuitClosure(g_run_loop->QuitWhenIdleClosure());
-    //    DCHECK(!run_message_loop_);
-    //    run_message_loop_ = true;
-    //}
-    //else
-    //{
-    //    run_message_loop_ = false;
-    //}
-    //app_creator_.reset();
+    if (app_creator_->Start(parsed_command_line()))
+    {
+        // Transfer ownership of the browser's lifetime to the BrowserProcess.
+        app_process_->SetQuitClosure(g_run_loop->QuitWhenIdleClosure());
+        DCHECK(run_message_loop_);
+    }
+    app_creator_.reset();
 }
 
 void AppMainPartsImpl::PostAppStart()
@@ -314,27 +311,26 @@ int AppMainPartsImpl::PreMainMessageLoopRunImpl()
 
     LogSystemInformation();
 
-    // When to install crash client is a little bit tricky, we must ensure that:
-    // (1) installing is not prior to mutiple application instances check.
-    // (2) installing is prior to main work stuff.
-
-    /*bool wait_result = lcpfw::WaitForCrashServerReady();
-    if (!wait_result) {
-        LOG(WARNING) << "Failed to bind with crash server; Turn into in-process mode";
-    }
-
-    crash_client_ = std::make_unique<lcpfw::CrashHandlerClient>();
-    crash_client_->Install();*/
-
 #if defined(OS_WIN)
     //ui::SelectFileDialog::SetFactory(new AppSelectFileDialogFactory());
 #endif  // defined(OS_WIN)
 
+    // 进行身份验证，为每个验证通过的用户创建其专属的配置文件
+    app_process_->background_mode_manager()->UpdateStatusTrayIcon(StatusTrayType::Login);
+    LoginResult result = LoginWindow::ShowWindow();
+    run_message_loop_ = true;
+    if (result != LoginResult::Success)
+    {
+        return lcpfw::ResultCodeLoginCancelled;
+    }
+
+    g_run_loop.reset(new base::RunLoop(base::RunLoop::Type::kNestableTasksAllowed));
+
     // Desktop construction occurs here, (required before profile creation).
     PreProfileInit();
-
-    // 进行身份验证，为每个验证通过的用户创建其专属的配置文件
-    //////////////////////////////////////////////////////////////////////////
+    
+    // load user profile
+    app_process_->InitLocalProfile();
 
     PostProfileInit();
 
@@ -344,6 +340,7 @@ int AppMainPartsImpl::PreMainMessageLoopRunImpl()
 
     PreAppStart();
 
+    // main UI show
     AppStart();
 
     PostAppStart();
@@ -358,11 +355,14 @@ bool AppMainPartsImpl::MainMessageLoopRun(int* result_code)
     *result_code = result_code_;
     if (!run_message_loop_)
     {
-        return false;  // Don't run the default message loop.
+        return false;  // Run the AppMessageLoop default message loop.
     }
 
-    DCHECK(base::CurrentUIThread::IsSet());
-    g_run_loop->Run();
+    if (g_run_loop)
+    {
+        DCHECK(base::CurrentUIThread::IsSet());
+        g_run_loop->Run();
+    }
 
     return true;
 }
@@ -387,6 +387,8 @@ void AppMainPartsImpl::PostDestroyThreads()
     // release it.
     ignore_result(app_process_.release());
 
+    g_run_loop.reset();
+
     //process_singleton_.reset();
 
     //device_event_log::Shutdown();
@@ -394,50 +396,8 @@ void AppMainPartsImpl::PostDestroyThreads()
 
 void AppMainPartsImpl::OnLocalStateLoaded()
 {
+    // determine locale and set
     app_process_->SetApplicationLocale(prefs::kLocaleZhCN);
-    /*auto locale_loaded = ui::ResourceBundle::InitSharedInstanceWithLocale(
-        prefs::kLocaleZhCN, nullptr, ui::ResourceBundle::DO_NOT_LOAD_COMMON_RESOURCES);
-    DCHECK_EQ(locale_loaded, prefs::kLocaleZhCN);
-    std::vector<ui::ScaleFactor> supported_scale_factors;
-    supported_scale_factors.push_back(ui::SCALE_FACTOR_100P);
-#if defined(OS_APPLE) || defined(OS_WIN)
-    supported_scale_factors.push_back(ui::SCALE_FACTOR_150P);
-    supported_scale_factors.push_back(ui::SCALE_FACTOR_200P);
-    supported_scale_factors.push_back(ui::SCALE_FACTOR_250P);
-    supported_scale_factors.push_back(ui::SCALE_FACTOR_300P);
-#endif
-    ui::SetSupportedScaleFactors(supported_scale_factors);
-
-    app_process_->SetApplicationLocale(locale_loaded);
-
-#ifdef _WIN32
-    ui::SetResourcesDataDLL(GetModuleHandleW(lcpfw::kAppResourcesDll));
-#endif
-
-    base::FilePath resources_pack_dir;
-    if (base::PathService::Get(lcpfw::DIR_RESOURCES, &resources_pack_dir))
-    {
-        static const std::vector<std::pair<ui::ScaleFactor, base::FilePath>> paks {
-            { ui::SCALE_FACTOR_100P, base::FilePath(L"app_100_percent.pak") },
-            { ui::SCALE_FACTOR_150P, base::FilePath(L"app_150_percent.pak") },
-            { ui::SCALE_FACTOR_200P, base::FilePath(L"app_200_percent.pak") },
-            { ui::SCALE_FACTOR_250P, base::FilePath(L"app_250_percent.pak") },
-            { ui::SCALE_FACTOR_300P, base::FilePath(L"app_300_percent.pak") },
-        };
-        for (auto& item : paks)
-        {
-            auto pak = resources_pack_dir.Append(item.second);
-            if (base::PathExists(pak))
-            {
-                ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
-                    pak, item.first);
-            }
-        }
-    }
-    else
-    {
-        NOTREACHED();
-    }*/
 }
 
 void AppMainPartsImpl::AddParts(std::unique_ptr<AppMainExtraParts> parts)

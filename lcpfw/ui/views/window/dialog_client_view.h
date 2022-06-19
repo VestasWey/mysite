@@ -52,6 +52,8 @@ class VIEWS_EXPORT DialogClientView : public ClientView, public DialogObserver {
   gfx::Size GetMinimumSize() const override;
   gfx::Size GetMaximumSize() const override;
   void VisibilityChanged(View* starting_from, bool is_visible) override;
+  void ChildPreferredSizeChanged(View* child) override {}
+
 
   void Layout() override;
   bool AcceleratorPressed(const ui::Accelerator& accelerator) override;

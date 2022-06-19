@@ -787,7 +787,7 @@ class CC_EXPORT LayerTreeHostImpl : public TileManagerClient,
       base::flat_map<PaintImage::Id, PaintImage::DecodingMode>
           decoding_mode_map);
 
-  void InitializeUkm(std::unique_ptr<ukm::UkmRecorder> recorder);
+  void InitializeUkm(/*std::unique_ptr<ukm::UkmRecorder> recorder*/);
   UkmManager* ukm_manager() { return ukm_manager_.get(); }
 
   ActiveFrameSequenceTrackers FrameSequenceTrackerActiveTypes() {

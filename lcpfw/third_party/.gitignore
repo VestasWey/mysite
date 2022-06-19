@@ -59,7 +59,7 @@
 /chromevox/third_party/sre/src
 /chromite
 /cld_2/src
-/cld_3/src
+#/cld_3/src
 /colorama/src
 /crc32c/src
 /cros
@@ -67,7 +67,7 @@
 /custom_tabs_client/src
 /cygwin
 /dav1d/libdav1d
-/dawn
+#/dawn
 /depot_tools
 /devtools-frontend/src
 /directxsdk
@@ -154,7 +154,7 @@
 /llvm-allocated-type
 /llvm-bootstrap
 /llvm-bootstrap-install
-/llvm-build
+#/llvm-build
 /llvm-build-tools
 /lss
 /marble

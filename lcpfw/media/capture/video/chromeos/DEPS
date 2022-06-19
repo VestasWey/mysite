@@ -1,5 +1,0 @@
-include_rules = [
-  "+ash/constants/ash_features.h",
-  "+components/chromeos_camera",
-  "+third_party/libsync",
-]

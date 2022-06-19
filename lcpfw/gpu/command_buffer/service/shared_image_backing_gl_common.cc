@@ -206,7 +206,9 @@ SharedImageBackingGLCommon::ProduceDawnCommon(SharedImageFactory* factory,
   // representation ref.
   factory->DestroySharedImage(dst_mailbox);
 
-  return manager->ProduceDawn(dst_mailbox, tracker, device);
+  //return manager->ProduceDawn(dst_mailbox, tracker, device);
+  NOTREACHED();
+  return nullptr;
 }
 
 // static

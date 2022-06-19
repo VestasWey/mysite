@@ -127,6 +127,7 @@ private:
     bool initialization_started_ = false;
     bool is_shutdown_ = false;
 
+    // Viz depends on the task environment to correctly tear down.
     std::unique_ptr<base::AppTaskEnvironment> task_environment_;
 
     // Prevents execution of ThreadPool tasks from the moment content is

@@ -1,0 +1,19 @@
+
+#include "main_dll_resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// BINDATA
+//
+
+//IDR_xxx   BINDATA     "xxxx.json"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "assets\\lcpfw.ico"

@@ -30,7 +30,7 @@
 /third_party/fuchsia/qemu
 /third_party/fuchsia/sdk
 /third_party/googletest/googletest
-/third_party/libfuzzer
+#/third_party/libfuzzer
 /third_party/linux/.cipd
 /third_party/linux/clang
 /third_party/linux/sysroot

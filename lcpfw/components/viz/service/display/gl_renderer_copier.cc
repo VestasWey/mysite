@@ -25,7 +25,7 @@
 #include "gpu/command_buffer/common/mailbox.h"
 #include "gpu/command_buffer/common/shared_image_usage.h"
 #include "gpu/command_buffer/common/sync_token.h"
-#include "third_party/libyuv/include/libyuv/planar_functions.h"
+//#include "third_party/libyuv/include/libyuv/planar_functions.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "third_party/skia/include/core/SkImageInfo.h"
 #include "ui/gfx/geometry/size.h"
@@ -446,8 +446,9 @@ class GLPixelBufferRGBAResult final : public CopyOutputResult {
           }
         }
       } else {
-        libyuv::CopyPlane(src, src_bytes_per_row, dest, stride,
-                          src_bytes_per_row, size().height());
+        /*libyuv::CopyPlane(src, src_bytes_per_row, dest, stride,
+                          src_bytes_per_row, size().height());*/
+          NOTREACHED();
       }
       gl->UnmapBufferCHROMIUM(GL_PIXEL_PACK_TRANSFER_BUFFER_CHROMIUM);
     }
@@ -687,18 +688,19 @@ class GLPixelBufferI420Result final : public CopyOutputResult {
           rect().OffsetFromOrigin() - aligned_rect_.OffsetFromOrigin();
       const int y_start_offset =
           result_offset.y() * y_stride + result_offset.x();
-      libyuv::CopyPlane(pixels + y_start_offset, y_stride, y_out, y_out_stride,
-                        size().width(), size().height());
+      /*libyuv::CopyPlane(pixels + y_start_offset, y_stride, y_out, y_out_stride,
+                        size().width(), size().height());*/
       pixels += y_stride * aligned_rect_.height();
       const int chroma_stride = aligned_rect_.width() / 2;
       const int chroma_start_offset =
           ((result_offset.y() / 2) * chroma_stride) + (result_offset.x() / 2);
       const int chroma_height = (size().height() + 1) / 2;
-      libyuv::CopyPlane(pixels + chroma_start_offset, chroma_stride, u_out,
-                        u_out_stride, chroma_row_bytes, chroma_height);
+      /*libyuv::CopyPlane(pixels + chroma_start_offset, chroma_stride, u_out,
+                        u_out_stride, chroma_row_bytes, chroma_height);*/
       pixels += chroma_stride * (aligned_rect_.height() / 2);
-      libyuv::CopyPlane(pixels + chroma_start_offset, chroma_stride, v_out,
-                        v_out_stride, chroma_row_bytes, chroma_height);
+      /*libyuv::CopyPlane(pixels + chroma_start_offset, chroma_stride, v_out,
+                        v_out_stride, chroma_row_bytes, chroma_height);*/
+      NOTREACHED();
     }
     return !!pixels;
   }

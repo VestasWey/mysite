@@ -636,6 +636,54 @@ component("gfx_switches") {
   deps = [ "//base" ]
 }
 
+static_library("test_support") {
+  testonly = true
+  sources = [
+    "animation/animation_test_api.cc",
+    "animation/animation_test_api.h",
+    "animation/keyframe/test/animation_utils.cc",
+    "animation/keyframe/test/animation_utils.h",
+    "animation/test_animation_delegate.h",
+    "geometry/test/rect_test_util.cc",
+    "geometry/test/rect_test_util.h",
+    "geometry/test/size_test_util.h",
+    "geometry/test/transform_test_util.cc",
+    "geometry/test/transform_test_util.h",
+    "image/image_unittest_util.cc",
+    "image/image_unittest_util.h",
+    "test/font_fallback_test_data.cc",
+    "test/font_fallback_test_data.h",
+    "test/gfx_util.cc",
+    "test/gfx_util.h",
+    "test/icc_profiles.cc",
+    "test/icc_profiles.h",
+  ]
+  if (is_ios) {
+    sources += [ "image/image_unittest_util_ios.mm" ]
+  }
+  if (is_mac) {
+    sources += [ "image/image_unittest_util_mac.mm" ]
+  }
+
+  public_deps = [ ":gfx" ]
+
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//skia",
+    #"//testing/gtest",
+    "//ui/gfx/animation",
+    "//ui/gfx/animation/keyframe",
+    "//ui/gfx/geometry",
+  ]
+
+  if (!is_ios) {
+    sources += [ "render_text_test_api.h" ]
+
+    deps += [ "//third_party:freetype_harfbuzz" ]
+  }
+}
+
 if (is_mac) {
   component("gfx_io_surface_hdr_metadata") {
     sources = [

@@ -9,7 +9,6 @@
 namespace lcpfw {
 
 #if !_HAS_CXX17
-
     template <class _Callable, class _Tuple, size_t... _Indices>
     constexpr decltype(auto) _Apply_impl(
         _Callable&& _Obj, _Tuple&& _Tpl, _STD index_sequence<_Indices...>)

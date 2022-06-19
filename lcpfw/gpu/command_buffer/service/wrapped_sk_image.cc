@@ -273,7 +273,8 @@ class WrappedSkImage : public ClearTrackingSharedImageBacking {
       case GrBackendApi::kVulkan: {
         GrVkImageInfo image_info;
         if (backend_texture_.getVkImageInfo(&image_info))
-          tracing_id_ = reinterpret_cast<uint64_t>(image_info.fImage);
+          //tracing_id_ = reinterpret_cast<uint64_t>(image_info.fImage);
+            tracing_id_ = (uint64_t)(image_info.fImage);
         break;
       }
 #if BUILDFLAG(SKIA_USE_DAWN)

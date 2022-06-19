@@ -792,7 +792,7 @@ void Compositor::RequestPresentationTimeForNextFrame(
 void Compositor::ReportMetricsForTracker(
     int tracker_id,
     const cc::FrameSequenceMetrics::CustomReportData& data) {
-  auto it = throughput_tracker_map_.find(tracker_id);
+  auto it = throughput_tracker_map_.find((size_t)tracker_id);
   if (it == throughput_tracker_map_.end())
     return;
 

@@ -1,47 +1,52 @@
 
+import("resources/build_resources.gni")
+
 include_dirs = [
     "//lcpfw/app",
 ]
 
-# group("app"){
-#     deps = [
-#         ":app_exec",
-#         ":app_exec",
-#     ]
-# }
-
 executable("app") {
+    if (is_win) {
+        configs += [ "//build/config/win:windowed" ]
+    }
+
     cflags = []
     sources = [
         "app_main.cpp",
+        "app_dll_loader.cc",
+        "app_dll_loader.h",
+        "app_installation_rejecter.h",
+        "app_installation_rejecter.cpp",
         "main_dll_loader.h",
         "main_dll_loader.cc",
-        "app_installation_rejecter.h",
-        "app_installation_rejecter.cpp"
     ]
 
-    # include_dirs = [
-    #     "//app",
-    # ]
-
-    # defines = [
-    #     "ELECSTUDY_EXPORTS",
-    # ]
-
-    # configs += [
-    #     "//config:lcnfw_precompiled_headers",
-    #     "//config:lcpfw_include_dirs",
-    # ]
+    if (is_win) {
+        sources += [
+            # icon info
+            "resources/win/app_resource.h",
+            "resources/win/app.rc",
+        ]
+    }
 
     deps = [
         ":common",
         ":app_main",
+        ":app_watcher",
     ]
+    
+    if (is_win) {
+        deps += [ 
+            "//build/win:default_exe_manifest",
+            "resources:app_ver",
+        ]
+    }
+
 }
 
 loadable_module("app_main") {
     sources = [
-        "main/main_entry.cc",
+        "main/module_entry.cc",
         "main/app_main_parts_impl.cc",
         "main/app_main_parts_impl.h",
         "main/app_main_extra_parts_views.cc",
@@ -55,7 +60,55 @@ loadable_module("app_main") {
         "main/profiles/prefs_register.h",
         "main/profiles/main_profile.cc",
         "main/profiles/main_profile.h",
+
+        "main/crash_handler/crash_handler_client.h",
+
+        # ui
+        "public/main/command_ids.h",
+        "public/main/notification_types.h",
+
+        "main/ui/background_mode_manager.cc",
+        "main/ui/background_mode_manager.h",
+        "main/ui/menu_item_ids.cc",
+        "main/ui/menu_item_ids.h",
+
+        "main/ui/startup_main_creator.cc",
+        "main/ui/startup_main_creator.h",
+        "main/ui/main_module.cc",
+        "main/ui/main_module.h",
+
+        "main/ui/command_controller.cc",
+        "main/ui/command_controller.h",
+        "main/ui/command_handler.cc",
+        "main/ui/command_handler.h",
+        "main/ui/command_updater.h",
+        "main/ui/command_updater_delegate.h",
+        "main/ui/command_updater_impl.cc",
+        "main/ui/command_updater_impl.h",
+
+        "main/ui/common_widget_delegate.cc",
+        "main/ui/common_widget_delegate.h",
+
+        "main/ui/login/login_window.cc",
+        "main/ui/login/login_window.h",
+
+        "main/ui/main/main_window.cc",
+        "main/ui/main/main_window.h",
     ]
+
+    if (is_win) {
+        sources += [
+            # icon info
+            "resources/win/main_dll_resource.h",
+            "resources/win/main_dll.rc",
+            
+            "main/crash_handler/crash_handler_client_win.cc",
+        ]
+    } else if (is_mac) {
+        sources += [
+            "main/crash_handler/crash_handler_client_mac.mm",
+        ]
+    }
 
     defines = ["APP_LIB_IMPLEMENTATION"]
 
@@ -66,19 +119,31 @@ loadable_module("app_main") {
         ":app_secret",
         ":common",
         ":content",
-        #":base_env"
 
         # ui deps modules
-        "//ui/base",
-        #"//components/crash/core/common",
-        #"//ui/gfx",
-        #"//services/metrics"
+        ":ui_base",
+        "resources:repack_ui_resources"
     ]
+    
+    if (is_win) {
+        deps += [
+            #"//build/win:default_exe_manifest",
+            "resources:main_ver",
+
+            # crashpad
+            "//third_party/breakpad:breakpad_handler",
+        ]
+    } else if (is_mac) {
+        deps += [
+            # crashpad
+            "//third_party/breakpad:breakpad",
+        ]
+    }
 }
 
 loadable_module("app_secret") {
     sources = [
-        "secret/secret_entry.cc",
+        "secret/module_entry.cc",
         "secret/app_secret.cc",
         "secret/app_secret.h",
         "secret/network/common_types.cc",
@@ -108,14 +173,83 @@ loadable_module("app_secret") {
         ":utils",
         #":base_env"
     ]
+    
+    if (is_win) {
+        deps += [
+            #"//build/win:default_exe_manifest",
+            "resources:secret_ver",
+        ]
+    }
+
 }
 
+loadable_module("app_watcher") {
+    sources = [
+        "watcher/app_watcher_parts_impl.cc",
+        "watcher/app_watcher_parts_impl.h",
+        "watcher/module_entry.cc",
+
+        "watcher/crash_handler/crash_handler_server.h",
+
+        # ui
+        "watcher/app_watcher_extra_parts_views.cc",
+        "watcher/app_watcher_extra_parts_views.h",
+        "watcher/ui/crash/crash_notify_window.cc",
+        "watcher/ui/crash/crash_notify_window.h",
+    ]
+
+    if (is_win) {
+        sources += [
+            "watcher/crash_handler/crash_handler_server_win.cc",
+        ]
+    } else if (is_mac) {
+        sources += [
+            "watcher/crash_handler/crash_handler_server_mac.mm",
+        ]
+    }
+
+    defines = ["APP_LIB_IMPLEMENTATION"]
+
+    deps = [
+        "//base",
+        #":app_secret",
+        ":common",
+        ":content",
+
+        # ui deps modules
+        ":ui_base",
+        "resources:repack_ui_resources"
+    ]
+    
+    if (is_win) {
+        deps += [
+            #"//build/win:default_exe_manifest",
+            #"resources:watcher_ver",
+
+            # crashpad
+            "//third_party/breakpad:breakpad_handler",
+        ]
+    } else if (is_mac) {
+        deps += [
+            # crashpad
+            "//third_party/breakpad:breakpad",
+        ]
+    }
+}
+
+# 所有模块基本都能用到的基础功能，包括：
+#   路径获取
+#   各种程序常量值（命令ID、特性Feature、配置文件key 等）
+#   日志记录初始化，以便LOG(XXX)能使用
+#   NotificationService（从chromium的//content/public/browser拷贝而来）
 source_set("common") {
     sources = [
         "common/app_constants.cpp",
         "common/app_constants.h",
         "common/app_context.cpp",
         "common/app_context.h",
+        "common/app_crash_helper.cc",
+        "common/app_crash_helper.h",
         "common/app_features.cpp",
         "common/app_features.h",
         "common/app_logging.cpp",
@@ -131,6 +265,16 @@ source_set("common") {
         "common/profiles/profile_impl.cc",
         "common/profiles/profile_impl.h",
         "common/profiles/profile.h",
+
+        "content/public/notification/notification_details.h",
+        "content/public/notification/notification_observer.h",
+        "content/public/notification/notification_registrar.cc",
+        "content/public/notification/notification_registrar.h",
+        "content/public/notification/notification_service.h",
+        "content/public/notification/notification_service_impl.cc",
+        "content/public/notification/notification_service_impl.h",
+        "content/public/notification/notification_source.h",
+        "content/public/notification/notification_types.h",
     ]
 
     if(is_win){
@@ -147,6 +291,13 @@ source_set("common") {
         ]
     }
 
+    defines = []
+    if (target_cpu == "x86") {
+        defines += ["_X86_"]
+    } else if(target_cpu == "x64") {
+        defines += ["_AMD64_"]
+    }
+
     public_configs = [
         "//config:lcpfw_precompiled_headers",
         "//config:lcpfw_include_dirs",
@@ -160,6 +311,10 @@ source_set("common") {
     ]
 }
 
+# 目前只有主模块main_dll才会用到的组件，是对chromium的程序启动框架的模仿，包括诸如：
+#   创建任务队列TaskQueue，才能进行PostTask
+#   创建任务执行器TaskRunner，才能进行PostTask并执行
+#   创建线程池Manager，后续才能使用依赖线程池的功能，比如Prefs配置文件读写服务
 source_set("content") {
     sources = [
         "content/app_discardable_memory_allocator.cc",
@@ -214,24 +369,85 @@ source_set("utils") {
     # ]
 }
 
-# 要使用chromium base库的常用功能所需要封装的组件，诸如：
-#   创建任务队列TaskQueue，才能进行PostTask
-#   创建任务执行器TaskRunner，才能进行PostTask并执行
-#   创建线程池Manager，后续才能使用依赖线程池的功能，比如Prefs配置文件读写服务
-# source_set("base_env") {
-#     sources = [
-#         "app_task_environment.h",
-#         "app_task_environment.cc",
-#         "app_discardable_memory_allocator.h",
-#         "app_discardable_memory_allocator.cc",
-#         "app_scoped_run_loop_timeout.h",
-#         "app_scoped_run_loop_timeout.cc",
-#     ]
+# 使用UI需要的全部依赖
+# sources中的源码基本都是从chromium的相应目录中copy过来进行适应性修改
+source_set("ui_base") {
+    sources = [
+        "ui/compositor/app_context_factories.cc",
+        "ui/compositor/app_context_factories.h",
+        "ui/compositor/app_direct_layer_tree_frame_sink.cc",
+        "ui/compositor/app_direct_layer_tree_frame_sink.h",
+        "ui/compositor/app_in_process_context_factory.cc",
+        "ui/compositor/app_in_process_context_factory.h",
+        "ui/compositor/app_in_process_context_provider.cc",
+        "ui/compositor/app_in_process_context_provider.h",
 
-#     public_configs = [
-#         "//config:lcpfw_precompiled_headers",
-#         "//config:lcpfw_include_dirs",
-#     ]
+        "ui/views/app_views_delegate.h",
+        "ui/views/app_desktop_views_delegate.h",
 
-#     public_deps = ["//base"]
-# }
+        "ui/views/status_icons/status_icon_menu_model.cc",
+        "ui/views/status_icons/status_icon_menu_model.h",
+        "ui/views/status_icons/status_icon_observer.h",
+        "ui/views/status_icons/status_icon.cc",
+        "ui/views/status_icons/status_icon.h",
+        "ui/views/status_icons/status_tray.cc",
+        "ui/views/status_icons/status_tray.h",
+
+        "components/viz/app_gpu_memory_buffer_manager.cc",
+        "components/viz/app_gpu_memory_buffer_manager.h",
+        "components/viz/app_gpu_service_holder.cc",
+        "components/viz/app_gpu_service_holder.h",
+        "components/viz/app_image_factory.cc",
+        "components/viz/app_image_factory.h",
+        "components/viz/app_shared_bitmap_manager.cc",
+        "components/viz/app_shared_bitmap_manager.h",
+
+        "components/keep_alive_registry/app_keep_alive_registry.cc",
+        "components/keep_alive_registry/app_keep_alive_registry.h",
+        "components/keep_alive_registry/app_keep_alive_state_observer.h",
+        "components/keep_alive_registry/app_keep_alive_types.cc",
+        "components/keep_alive_registry/app_keep_alive_types.h",
+        "components/keep_alive_registry/app_scoped_keep_alive.cc",
+        "components/keep_alive_registry/app_scoped_keep_alive.h",
+
+        "cc/app_pixel_output_surface.cc",
+        "cc/app_pixel_output_surface.h",
+        "cc/app_task_graph_runner.cc",
+        "cc/app_task_graph_runner.h",
+    ]
+
+    if (is_win) {
+        sources += [
+            "ui/views/app_views_delegate_win.cc",
+            "ui/views/app_desktop_views_delegate_win.cc",
+            
+            "ui/views/status_icons/status_tray_state_changer_win.cc",
+            "ui/views/status_icons/status_tray_state_changer_win.h",
+            "ui/views/status_icons/status_icon_win.cc",
+            "ui/views/status_icons/status_icon_win.h",
+            "ui/views/status_icons/status_tray_win.cc",
+            "ui/views/status_icons/status_tray_win.h",
+
+            "ui/win/app_icon.cc",
+            "ui/win/app_icon.h",
+        ]
+    }
+
+    if (is_mac) {
+        sources += [
+            "ui/views/app_views_delegate_mac.mm",
+            "ui/views/app_desktop_views_delegate_mac.mm",
+        ]
+    }
+
+    public_configs = [
+        "//config:lcpfw_precompiled_headers",
+        "//config:lcpfw_include_dirs",
+    ]
+
+    public_deps = [
+        "//ui/views",
+        "//components/viz/service",
+        "//mojo/core/embedder",
+    ]
+}

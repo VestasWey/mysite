@@ -59,8 +59,10 @@ if (is_official_build) {
 group("gn_all") {
 
   deps = [
-    ":gn_visibility",
+    #":gn_visibility",
     "//base",
+
+    # UI
     "//ui/base:base",
 
     # customer
@@ -79,18 +81,30 @@ group("gn_all") {
   # }
 }
 
+group("gn_examples") {
+  testonly = true
+  
+  deps = []
+  
+  if (toolkit_views) {
+    deps += [
+      "//ui/views/examples:views_examples",
+    ]
+  }
+}
+
 # TODO(GYP_GONE): Figure out if we really need this target or if there's
 # some better way to specify things.
 if (is_win) {
 }
 
-group("gn_visibility") {
-  deps = [
-    "//build/config/sanitizers:options_sources",
-    # "//third_party/pdfium:pdfium_embeddertests",  # TODO(GYP): visibility?
-    # "//third_party/pdfium:pdfium_unittests",  # TODO(GYP): visibility?
-  ]
-}
+#group("gn_visibility") {
+#  deps = [
+#    "//build/config/sanitizers:options_sources",
+#    # "//third_party/pdfium:pdfium_embeddertests",  # TODO(GYP): visibility?
+#    # "//third_party/pdfium:pdfium_unittests",  # TODO(GYP): visibility?
+#  ]
+#}
 
 
 # Because of the source assignment filter, many targets end up over-filtering

@@ -9,7 +9,7 @@
 namespace cc {
 
 FakeVideoFrameProvider::FakeVideoFrameProvider()
-    : frame_(nullptr), client_(nullptr), put_current_frame_count_(0) {}
+    : /*frame_(nullptr), */client_(nullptr), put_current_frame_count_(0) {}
 
 FakeVideoFrameProvider::~FakeVideoFrameProvider() {
   if (client_)
@@ -26,12 +26,13 @@ void FakeVideoFrameProvider::SetVideoFrameProviderClient(Client* client) {
 }
 
 bool FakeVideoFrameProvider::HasCurrentFrame() {
-  return static_cast<bool>(frame_);
+  //return static_cast<bool>(frame_);
+  return false;
 }
 
-scoped_refptr<media::VideoFrame> FakeVideoFrameProvider::GetCurrentFrame() {
-  return frame_;
-}
+//scoped_refptr<media::VideoFrame> FakeVideoFrameProvider::GetCurrentFrame() {
+//  return frame_;
+//}
 
 void FakeVideoFrameProvider::PutCurrentFrame() {
   ++put_current_frame_count_;

@@ -11,7 +11,7 @@
 #include "services/metrics/public/cpp/metrics_export.h"
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
-//#include "services/metrics/public/mojom/ukm_interface.mojom.h"
+#include "services/metrics/public/mojom/ukm_interface.mojom.h"
 
 namespace ukm {
 
@@ -29,7 +29,7 @@ class METRICS_EXPORT UkmEntryBuilderBase {
   void Record(UkmRecorder* recorder);
 
   // Extracts the created UkmEntryPtr. Record() cannot be called after this.
-  //mojom::UkmEntryPtr TakeEntry();
+  mojom::UkmEntryPtr TakeEntry();
 
  protected:
   UkmEntryBuilderBase(ukm::SourceIdObj source_id, uint64_t event_hash);
@@ -40,7 +40,7 @@ class METRICS_EXPORT UkmEntryBuilderBase {
   void SetMetricInternal(uint64_t metric_hash, int64_t value);
 
  private:
-  //mojom::UkmEntryPtr entry_;
+  mojom::UkmEntryPtr entry_;
 
   DISALLOW_COPY_AND_ASSIGN(UkmEntryBuilderBase);
 };

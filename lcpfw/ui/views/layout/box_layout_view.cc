@@ -98,7 +98,7 @@ int BoxLayoutView::GetBetweenChildSpacing() const {
 }
 
 void BoxLayoutView::SetCollapseMarginsSpacing(bool collapse_margins_spacing) {
-  if (collapse_margins_spacing_ == collapse_margins_spacing)
+  if (!!collapse_margins_spacing_ == collapse_margins_spacing)
     return;
   layout_->SetCollapseMarginsSpacing(collapse_margins_spacing);
   collapse_margins_spacing_ = collapse_margins_spacing;

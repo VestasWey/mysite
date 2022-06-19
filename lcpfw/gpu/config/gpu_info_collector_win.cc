@@ -17,7 +17,9 @@
 #include <d3d11_3.h>
 #include <d3d12.h>
 #include <dxgi.h>
+#if BUILDFLAG(ENABLE_VULKAN)
 #include <vulkan/vulkan.h>
+#endif
 #include <wrl/client.h>
 
 #include "base/file_version_info_win.h"
@@ -325,6 +327,7 @@ bool BadGraphicsDriverVersions(const gpu::GPUInfo::GPUDevice& gpu_device) {
   return false;
 }
 
+#if BUILDFLAG(ENABLE_VULKAN)
 bool InitVulkan(base::NativeLibrary* vulkan_library,
                 PFN_vkGetInstanceProcAddr* vkGetInstanceProcAddr,
                 PFN_vkCreateInstance* vkCreateInstance,
@@ -482,6 +485,7 @@ uint32_t GetGpuSupportedVulkanVersion(
   // base::UnloadNativeLibrary(vulkan_library);
   return 0;
 }
+#endif
 
 void RecordGpuSupportedDx12VersionHistograms(uint32_t d3d12_feature_level) {
   bool supports_dx12 =

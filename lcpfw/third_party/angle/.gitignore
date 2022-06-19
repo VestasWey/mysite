@@ -36,7 +36,7 @@
 /third_party/cherry
 /third_party/fuchsia-sdk
 /third_party/gles1_conform
-/third_party/glmark2/src
+#/third_party/glmark2/src
 /third_party/googletest
 /third_party/jsoncpp
 /third_party/libjpeg_turbo
@@ -47,9 +47,9 @@
 /third_party/Python-Markdown
 /third_party/qemu-linux-x64
 /third_party/qemu-mac-x64
-/third_party/rapidjson/src
+#/third_party/rapidjson/src
 /third_party/SwiftShader
-/third_party/VK-GL-CTS/src
+#/third_party/VK-GL-CTS/src
 /third_party/vulkan-deps
 /third_party/vulkan_memory_allocator
 /third_party/zlib

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grit latest_public_release="0" current_release="1">
+  <outputs>
+    <output filename="grit/ui_resources.h" type="rc_header" context="default_100_percent">
+      <emit emit_type='prepend'></emit>
+    </output>
+    <output filename="grit/ui_resources_map.cc" type="resource_map_source" context="default_100_percent" />
+    <output filename="grit/ui_resources_map.h" type="resource_map_header" context="default_100_percent" />
+    <output filename="app_100_percent.pak" type="data_package" context="default_100_percent" />
+    <output filename="app_150_percent.pak" type="data_package" context="default_150_percent" />
+    <output filename="app_200_percent.pak" type="data_package" context="default_200_percent" />
+  </outputs>
+  <release seq="1">
+    <structures fallback_to_low_resolution="true">
+      <structure type="chrome_scaled_image" name="IDR_APP_LOGIN_DEF_USR_FACE" file="face.png" />
+      <structure type="chrome_scaled_image" name="IDR_APP_SCENE_NOTICE_IMG" file="scene_notice.png" />
+      <structure type="chrome_scaled_image" name="IDR_APP_LIVEHIME_STATUS" file="status.png" />
+      <if expr="not is_android">
+        <structure type="chrome_scaled_image" name="IDR_APP_FOLDER_CLOSED" file="face.png" />
+        <if expr="is_win">
+          <structure type="chrome_scaled_image" name="IDR_APP_FOLDER_OPEN" file="status.png" />
+        </if>
+      </if>
+    </structures>
+    <includes>
+      <include name="IDR_UPLOADER_LOADING_TV" file="gif/loadingTV.gif" type="gif" />
+
+      <include name="IDR_LIVEMAIN_SVGA_MELEE_COUNTDOWN" file="svga/live_melee_countdown.svga" type="bin" />
+    </includes>
+  </release>
+</grit>
