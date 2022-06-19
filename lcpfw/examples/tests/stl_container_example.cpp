@@ -56,7 +56,7 @@ namespace
         }
 
         // iter valid
-        std::cout << "after first emplace, rehash£¬enum key=5 to end" << std::endl;
+        std::cout << "after first emplace, rehashÂ£Â¬enum key=5 to end" << std::endl;
         for (auto tmp = iter; tmp != umap.end(); ++tmp)
         {
             std::cout << "bucket=" << umap.bucket(tmp->first) << ", \tk=" << tmp->first << ", \tv=" << tmp->second << std::endl;
@@ -135,7 +135,7 @@ namespace
         }
 
         // iter valid
-        std::cout << "after first emplace, rehash£¬enum key=5 to end" << std::endl;
+        std::cout << "after first emplace, rehashÂ£Â¬enum key=5 to end" << std::endl;
         for (auto tmp = iter; tmp != uset.end(); ++tmp)
         {
             std::cout << "k=" << *tmp << std::endl;

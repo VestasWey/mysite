@@ -11,10 +11,10 @@ struct PublishedFileInfo
         md5,
         sha1,
     };
-    std::string relate_path;// ���·��
-    int hash_type = PublishedFileHashType::md5;  // �ļ�hash����
-    std::string hash;   // �ļ�hashֵ
-    __int64 length = 0; // �ļ���С
+    std::string relate_path;// 相对路径
+    int hash_type = PublishedFileHashType::md5;  // 文件hash类型
+    std::string hash;   // 文件hash值
+    __int64 length = 0; // 文件大小
 
     bool operator ==(const PublishedFileInfo& _Right) const
     {
@@ -73,7 +73,7 @@ void vector_operation_study()
         {"k.exe", 0, "hashK", 5678}
     };
 
-    // ��ǰ�����Ƚ��������򣬰����·������
+    // 求差集前必须先将集合排序，按相对路径来排
     std::sort(local_files.begin(), local_files.end(), 
         [](const PublishedFileInfo& v1, const PublishedFileInfo& v2)->bool
         {
@@ -87,9 +87,9 @@ void vector_operation_study()
         }
     );
 
-    // ֱ����Զ�˷����ļ��б��Ա����ļ��б��Ĳ������ͨ����ɣ�����Ҫ�ԳƲ��
-    // ����Զ�����ڱ���û�е���ѵ�һ�����ϵ�����������ϣ�ȫ��������Զ�˵�Ϊ׼������remote_files������Ϊ��һ�����ϲ�����
-    // �ó�����Զ������Ϊ�����Ĳ�Ǳ�����������Ҫ������ıȽ��ж���
+    // 直接求远端发布文件列表对本地文件列表的差集，求普通差集即可，不需要对称差集；
+    // 即在远端有在本地没有的则把第一个集合的项插入结果集合，全部数据以远端的为准，所以remote_files必须作为第一个集合参数；
+    // 得出的以远端数据为基础的差集是必须更新项，不需要做额外的比较判断了
     std::vector<PublishedFileInfo> diff_files;
     std::set_difference(remote_files.begin(), remote_files.end(), local_files.begin(), local_files.end(),
         std::back_inserter(diff_files),
@@ -99,7 +99,7 @@ void vector_operation_study()
         }
     );
 
-    // �󽻼�������ͬ����ѵ�һ�����ϵ�����������ϣ�ȫ��������Զ�˵�Ϊ׼������remote_files������Ϊ��һ�����ϲ���
+    // 求交集，有相同的则把第一个集合的项插入结果集合，全部数据以远端的为准，所以remote_files必须作为第一个集合参数
     std::vector<PublishedFileInfo> itsct_files;
     std::set_intersection(remote_files.begin(), remote_files.end(), local_files.begin(), local_files.end(),
         std::back_inserter(itsct_files),
@@ -109,7 +109,7 @@ void vector_operation_study()
         }
     );
 
-    // ���������б����Ա����ļ��б����бȽϣ�HASH��һ�µı������
+    // 将交集进行遍历对本地文件列表进行比较，HASH不一致的必须更新
     std::vector<PublishedFileInfo> copy_files;
     for (auto& r_file : itsct_files)
     {
@@ -120,8 +120,8 @@ void vector_operation_study()
             }
         );
 
-        // ·����ͬ�Ľ������ļ���һ���Ǿ���Ҫ���£�
-        // һ�µ�ֱ�ӿ���һ�ݼ���
+        // 路径相同的交集项文件不一致那就需要更新，
+        // 一致的直接拷贝一份即可
         if (find_ret == local_files.end())
         {
             diff_files.push_back(r_file);
@@ -132,7 +132,7 @@ void vector_operation_study()
         }
     }
 
-    // ���ˣ������ļ��б���Զ���ļ��б��ԱȽ������Աȵó����������:
-    // diff_files����������¼������Ҫ���ظ��µ��Զ�������Ļ���Զ�����޸ĵģ���
-    // copy_files����������¼���ǲ���Ҫ���ظ��µ��ֱ�ӿ���һ�ݵ��°汾Ŀ��Ŀ¼���ɣ�
+    // 至此，本地文件列表和远端文件列表对比结束，对比得出两个结果集:
+    // diff_files：结果集里记录的是需要下载更新的项（远端新增的或是远端有修改的）；
+    // copy_files：结果集里记录的是不需要下载更新的项，直接拷贝一份到新版本目标目录即可；
 }

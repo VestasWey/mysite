@@ -1,0 +1,75 @@
+
+executable("tests_console")
+{
+    cflags = []
+    sources = [
+        "tests/auto_decltype.cpp",
+        "tests/bus_line.cpp",
+        "tests/chromium_post_task_example.cpp",
+        "tests/console_app.cpp",
+        "tests/dead_lock_example.cpp",
+        "tests/def.h",
+        "tests/effective_example.cpp",
+        "tests/ipc_channel.cpp",
+        "tests/ipv6_example.cpp",
+        #"tests/mctm_test.cpp",
+        "tests/right_value_ref.cpp",
+        "tests/sort_example.cpp",
+        "tests/std_bind_task_example.cpp",
+        "tests/stdafx.h",
+        "tests/stl_container_example.cpp",
+        "tests/thread_message.cpp",
+        "tests/variadic_templates_example.cpp",
+        "tests/vector_operation_study.cpp",
+    ]
+
+    # include_dirs = [
+    #     "//.",
+    # ]
+
+    configs += [
+        "//build/config/compiler:exceptions",   # 允许使用C++异常
+    ]
+
+    if (is_win) {
+        configs -= [
+            "//build/config/compiler:chromium_code",   # 不需要默认的警告当error处理
+        ]
+        cflags += [ "/W4" ]  # Warning level 4.
+        #cflags = [ "/WX-" ]  # 不需要默认的警告当error处理
+    }
+
+    # defines = [
+    #     "ELECSTUDY_EXPORTS",
+    # ]
+
+    deps = ["//base"]
+}
+
+
+action("dispatch_for_proj") {
+    arg = [
+        "--kernel", rebase_path("//"),
+        "--outpath", rebase_path("//out/ffapi-study"),
+        "--cachepath", rebase_path("$root_out_dir"),
+    ]
+
+    if (is_debug) {
+        arg += [ "--buildmode", "Debug" ]
+    } else {
+        arg += [ "--buildmode", "Release" ]
+    }
+
+    if (is_mac) {
+        arg += ["--platform", "mac"]
+    } else if (is_win) {
+        arg += ["--platform", "win"]
+    }
+
+    arg += ["--targetcpu", "${target_cpu}"]
+    
+    script = "//dispatch_for_ide.py"
+    outputs = ["$root_out_dir/ffapi-study.ouput"]
+    args = arg
+    deps = []
+}

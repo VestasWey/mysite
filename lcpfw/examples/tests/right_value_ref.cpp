@@ -216,7 +216,7 @@ namespace
             //other._length = 0;
 
 
-            // »áµ÷ÓÃMemoryBlock& operator=(MemoryBlock&& other)£¬¼õÉÙ´úÂëÈßÓà
+            // ä¼šè°ƒç”¨MemoryBlock& operator=(MemoryBlock&& other)ï¼Œå‡å°‘ä»£ç å†—ä½™
             *this = std::move(other);
         }
 
@@ -256,9 +256,9 @@ namespace
 // https://msdn.microsoft.com/zh-cn/library/dd293665.aspx?f=255&MSPPError=-2147217396
 // https://www.cnblogs.com/boydfd/p/5182743.html
 // https://blog.csdn.net/linwh8/article/details/51569807
-//ºÎÎªÍêÃÀ×ª·¢£¿ÊÇÖ¸ÔÚº¯ÊýÄ£°åÖÐ£¬ÍêÈ«ÒÀÕÕÄ£°åµÄ²ÎÊýÀàÐÍ£¬½«²ÎÊý´«µÝ¸øº¯ÊýÄ£°åÖÐµ÷ÓÃÁíÍâÒ»¸öº¯Êý¡£
-//ÓÐÍêÃÀ×ª·¢ÄÇÃ´¿Ï¶¨Ò²ÓÐ²»ÍêÃÀ×ª·¢¡£Èç¹ûÔÚ²ÎÊý´«µÝµÄ¹ý³ÌÖÐ²úÉúÁË¶îÍâµÄÁÙÊ±¶ÔÏó¿½±´£¬ÄÇÃ´Æä×ª·¢Ò²¾ÍËã²»ÉÏÍêÃÀ×ª·¢¡£
-//ÎªÁË±ÜÃâÆð²»ÍêÃÀ£¬ÎÒÃÇÒª½èÖúÓÚÒýÓÃÒÔ·ÀÖ¹Æä½øÐÐÁÙÊ±¶ÔÏóµÄ¿½±´¡£
+//ä½•ä¸ºå®Œç¾Žè½¬å‘ï¼Ÿæ˜¯æŒ‡åœ¨å‡½æ•°æ¨¡æ¿ä¸­ï¼Œå®Œå…¨ä¾ç…§æ¨¡æ¿çš„å‚æ•°ç±»åž‹ï¼Œå°†å‚æ•°ä¼ é€’ç»™å‡½æ•°æ¨¡æ¿ä¸­è°ƒç”¨å¦å¤–ä¸€ä¸ªå‡½æ•°ã€‚
+//æœ‰å®Œç¾Žè½¬å‘é‚£ä¹ˆè‚¯å®šä¹Ÿæœ‰ä¸å®Œç¾Žè½¬å‘ã€‚å¦‚æžœåœ¨å‚æ•°ä¼ é€’çš„è¿‡ç¨‹ä¸­äº§ç”Ÿäº†é¢å¤–çš„ä¸´æ—¶å¯¹è±¡æ‹·è´ï¼Œé‚£ä¹ˆå…¶è½¬å‘ä¹Ÿå°±ç®—ä¸ä¸Šå®Œç¾Žè½¬å‘ã€‚
+//ä¸ºäº†é¿å…èµ·ä¸å®Œç¾Žï¼Œæˆ‘ä»¬è¦å€ŸåŠ©äºŽå¼•ç”¨ä»¥é˜²æ­¢å…¶è¿›è¡Œä¸´æ—¶å¯¹è±¡çš„æ‹·è´ã€‚
 void right_ref_study()
 {
     int i = 22;
@@ -297,7 +297,7 @@ void right_ref_study()
     std::cout << std::endl;
     v.insert(v.begin() + 1, MemoryBlock(50));
 
-    // std::moveÎÞÌõ¼þµØ°ÑËüµÄ²ÎÊý×ª»»³ÉÒ»¸öÓÒÖµ£¬¶østd::forwardÖ»ÔÚÌØ¶¨Ìõ¼þÂú×ãµÄÇé¿öÏÂÖ´ÐÐÕâ¸ö×ª»»¡£
+    // std::moveæ— æ¡ä»¶åœ°æŠŠå®ƒçš„å‚æ•°è½¬æ¢æˆä¸€ä¸ªå³å€¼ï¼Œè€Œstd::forwardåªåœ¨ç‰¹å®šæ¡ä»¶æ»¡è¶³çš„æƒ…å†µä¸‹æ‰§è¡Œè¿™ä¸ªè½¬æ¢ã€‚
     std::string str0 = "asd";
     std::string str1 = std::move(str0);
     std::string str2 = std::forward<std::string>(str1);

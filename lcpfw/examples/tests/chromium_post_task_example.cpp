@@ -16,9 +16,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "base/threading/platform_thread.h"
+#include "base\task\sequence_manager\sequence_manager.h"
+#include "base/task/post_task.h"
+#include "base/location.h"
 
 
-// https://www.cnblogs.com/qicosmos/p/4325949.html 可变模版参数
+// https://www.cnblogs.com/qicosmos/p/4325949.html 鍙彉妯＄増鍙傛暟
 namespace
 {
     void print_func(const char *name)
@@ -55,419 +59,6 @@ namespace
         va_end(args);
 
         return str;
-    }
-
-    /*
-     * RunnableAdapter封装函数原型以及函数调用接口
-     */
-    template <class Functor>
-    class RunnableAdapter;
-
-    template <class R>
-    class RunnableAdapter<R(*)()>
-    {
-    public:
-        typedef typename std::decay<Functor>::type RunType;
-        typedef typename std::result_of_t<RunType()>::type ResultType;
-
-        explicit RunnableAdapter(R(T::*function)())
-            : function_(function)
-        {
-        }
-
-        R Run()
-        {
-            return function_();
-        }
-
-    private:
-        R(T::*function_)() = nullptr;
-    };
-
-    template <class R, class T>
-    class RunnableAdapter<R(T::*)()>
-    {
-    public:
-        typedef typename std::decay<Functor>::type RunType;
-        typedef typename std::result_of_t<RunType()>::type ResultType;
-
-        //template <typename... Args>
-        explicit RunnableAdapter(R(T::*method)())
-            : method_(method)
-        {
-        }
-
-        R Run(T* object)
-        {
-            //return object->method_();
-            return (object->*method_)();
-        }
-
-    private:
-        R(T::*method_)() = nullptr;
-        //std::weak_ptr<T> weak_ptr_;
-    };
-
-    template <class R, class T>
-    class RunnableAdapter<R(T::*)() const>
-    {
-    public:
-        typedef typename std::decay<Functor>::type RunType;
-        typedef typename std::result_of_t<RunType()>::type ResultType;
-
-        //template <typename... Args>
-        explicit RunnableAdapter(R(T::*method)() const)
-            : method_(method)
-        {
-        }
-
-        R Run(const T* object)
-        {
-            //return object->method_();
-            return (object->*method_)();
-        }
-
-    private:
-        R(T::*method_)() const = nullptr;
-        //std::weak_ptr<T> weak_ptr_;
-    };
-
-    /*
-     * BindStates存储RunnableAdapter所封装的函数的参数以及成员函数的类实例指针
-     */
-
-    // callback
-    class CallbackBase
-    {
-    public:
-        CallbackBase()
-        {
-            post_thread_id_ = std::this_thread::get_id();
-        }
-        virtual ~CallbackBase() = default;
-        virtual void Run() = 0;
-
-        std::thread::id get_post_thread_id() { return post_thread_id_; }
-
-    protected:
-        std::thread::id post_thread_id_;
-    };
-
-    template<bool IsMemberFunc, typename T, bool FillRealArgument, typename BindFunc>
-    class Callback;
-
-    // global function
-    template<typename BindFunc>
-    class Callback<false, void, true, BindFunc> : public CallbackBase
-    {
-        typedef typename std::decay<BindFunc>::type _FuncType;
-        typedef typename std::result_of<_FuncType()>::type _ResultType;
-    public:
-        Callback(BindFunc&& func)
-            : func_(func)
-        {
-        }
-
-        virtual void Run() override
-        {
-            func_();
-        }
-
-        _ResultType RunWithResult()
-        {
-            return func_();
-        }
-
-    private:
-        _FuncType func_;
-    };
-
-    template<typename BindFunc>
-    class Callback<false, void, false, BindFunc> : public CallbackBase
-    {
-        typedef typename std::decay<BindFunc>::type _FuncType;
-        typedef typename std::result_of<_FuncType()>::type _ResultType;
-    public:
-        Callback(BindFunc&& func)
-            : func_(func)
-        {
-        }
-
-        virtual void Run() override
-        {
-            assert(false);
-        }
-
-        template <typename... Args>
-        _ResultType RunWithParam(Args&&... args)
-        {
-            return func_(std::forward<Args>(args)...);
-        }
-
-    private:
-        _FuncType func_;
-    };
-
-    // member function
-    template<typename T, typename BindFunc>
-    class Callback<true, T, true, BindFunc> : public CallbackBase
-    {
-        typedef typename std::decay<BindFunc>::type _FuncType;
-        typedef typename std::result_of<_FuncType()>::type _ResultType;
-    public:
-        Callback(BindFunc&& func, std::weak_ptr<T> &weakptr)
-            : func_(func)
-            , weakptr_(weakptr)
-        {
-        }
-
-        virtual void Run() override
-        {
-            std::shared_ptr<T> refptr = weakptr_.lock();
-            if (refptr)
-            {
-                func_();
-            }
-            else
-            {
-                print_func("Run obj deleted!");
-            }
-        }
-
-        _ResultType RunWithResult()
-        {
-            std::shared_ptr<T> refptr = weakptr_.lock();
-            if (refptr)
-            {
-                return func_();
-            }
-            else
-            {
-                print_func("RunWithResult obj deleted!");
-            }
-
-            return _ResultType();
-        }
-
-    private:
-        _FuncType func_;
-        std::weak_ptr<T> weakptr_;
-    };
-
-    template<typename T, typename BindFunc>
-    class Callback<true, T, false, BindFunc> : public CallbackBase
-    {
-        typedef typename std::decay<BindFunc>::type _FuncType;
-        typedef typename std::result_of<_FuncType()>::type _ResultType;
-    public:
-        Callback(BindFunc&& func, std::weak_ptr<T> &weakptr)
-            : func_(func)
-            , weakptr_(weakptr)
-        {
-        }
-
-        virtual void Run() override
-        {
-            assert(false);
-        }
-
-        template <typename... Args>
-        _ResultType RunWithParam(Args&&... args)
-        {
-            std::shared_ptr<T> refptr = weakptr_.lock();
-            if (refptr)
-            {
-                return func_(std::forward<Args>(args)...);
-            }
-            else
-            {
-                print_func("RunWithParam obj deleted!");
-            }
-
-            return _ResultType();
-        }
-
-    private:
-        _FuncType func_;
-        std::weak_ptr<T> weakptr_;
-    };
-
-    template <class Functor>
-    Callback<> Bind(Functor functor)
-    {
-        return Callback<>();
-    }
-
-    // create direct runable task
-    template<typename BindFunc>
-    std::shared_ptr<Callback<false, void, true, BindFunc>>
-        CreateTask(BindFunc&& _Fx)
-    {
-        using task_type = Callback<false, void, true, BindFunc>;
-        return std::shared_ptr<task_type>(new task_type(std::forward<BindFunc>(_Fx)));
-    }
-
-    template<typename T, typename BindFunc>
-    std::shared_ptr<Callback<true, T, true, BindFunc>>
-        CreateTask(BindFunc&& _Fx, std::weak_ptr<T> &weakptr)
-    {
-        using task_type = Callback<true, T, true, BindFunc>;
-        return std::shared_ptr<task_type>(new task_type(std::forward<BindFunc>(_Fx), weakptr));
-    }
-
-    // create reply task
-    template<typename BindFunc>
-    std::shared_ptr<Callback<false, void, false, BindFunc>>
-        CreateReplyTask(BindFunc&& _Fx)
-    {
-        using task_type = Callback<false, void, false, BindFunc>;
-        return std::shared_ptr<task_type>(new task_type(std::forward<BindFunc>(_Fx)));
-    }
-
-    template<typename T, typename BindFunc>
-    std::shared_ptr<Callback<true, T, false, BindFunc>>
-        CreateReplyTask(BindFunc&& _Fx, std::weak_ptr<T> &weakptr)
-    {
-        using task_type = Callback<true, T, false, BindFunc>;
-        return std::shared_ptr<task_type>(new task_type(std::forward<BindFunc>(_Fx), weakptr));
-    }
-
-    // post and reply
-    template <typename ReplyCallback, typename... RArgs>
-    void ReplyAdapter(ReplyCallback reply, RArgs... args)
-    {
-        reply->RunWithParam(std::move(args...));
-    }
-
-    template <typename TaskCallback, typename ReplyCallback>
-    void ReturnAsParamAdapter(TaskCallback task, ReplyCallback reply)
-    {
-        std::shared_ptr<CThread> thd = CThread::GetThread(reply->get_post_thread_id());
-        if (thd)
-        {
-            using result_type = std::decay<decltype(task->RunWithResult())>::type;
-            result_type ret = task->RunWithResult();
-
-            auto task = std::bind(ReplyAdapter<ReplyCallback, result_type>, reply, ret);
-            thd->PostTask(task);
-        }
-    }
-
-    template<typename TaskStdBindFunc, typename ReplyStdBindFunc>
-    bool PostTaskAndReplyWithResult(
-        int tid,
-        TaskStdBindFunc &&task,
-        ReplyStdBindFunc &&reply
-        )
-    {
-        bool operate = false;
-
-        if (g_thread_map.find(tid) != g_thread_map.end())
-        {
-            using ttype = std::decay<std::shared_ptr<Callback<false, void, true, TaskStdBindFunc>>>::type;
-            using rtype = std::decay<std::shared_ptr<Callback<false, void, false, ReplyStdBindFunc>>>::type;
-            ttype tc = CreateTask(std::forward<TaskStdBindFunc>(task));
-            rtype rc = CreateReplyTask(std::forward<ReplyStdBindFunc>(reply));
-
-            auto task = std::bind(ReturnAsParamAdapter<ttype, rtype>, tc, rc);
-            g_thread_map[tid]->PostTask(task);
-
-            operate = true;
-        }
-
-        return operate;
-    }
-
-    template<typename TaskStdBindFunc, typename TaskClassType, typename ReplyStdBindFunc>
-    bool PostTaskAndReplyWithResult(
-        int tid,
-        TaskStdBindFunc &&task,
-        std::weak_ptr<TaskClassType> &task_weakptr,
-        ReplyStdBindFunc &&reply
-        )
-    {
-        bool operate = false;
-
-        if (g_thread_map.find(tid) != g_thread_map.end())
-        {
-            using ttype = std::decay<std::shared_ptr<Callback<true, TaskClassType, true, TaskStdBindFunc>>>::type;
-            using rtype = std::decay<std::shared_ptr<Callback<false, void, false, ReplyStdBindFunc>>>::type;
-            ttype tc = CreateTask(std::forward<TaskStdBindFunc>(task), task_weakptr);
-            rtype rc = CreateReplyTask(std::forward<ReplyStdBindFunc>(reply));
-
-            auto task = std::bind(ReturnAsParamAdapter<ttype, rtype>, tc, rc);
-            g_thread_map[tid]->PostTask(task);
-
-            operate = true;
-        }
-
-        return operate;
-    }
-
-    template<typename TaskStdBindFunc, typename ReplyStdBindFunc, typename ReplyClassType>
-    bool PostTaskAndReplyWithResult(
-        int tid,
-        TaskStdBindFunc &&task,
-        ReplyStdBindFunc &&reply,
-        std::weak_ptr<ReplyClassType> &reply_weakptr
-        )
-    {
-        bool operate = false;
-
-        if (g_thread_map.find(tid) != g_thread_map.end())
-        {
-            using ttype = std::decay<std::shared_ptr<Callback<false, void, true, TaskStdBindFunc>>>::type;
-            using rtype = std::decay<std::shared_ptr<Callback<true, ReplyClassType, false, ReplyStdBindFunc>>>::type;
-            ttype tc = CreateTask(std::forward<TaskStdBindFunc>(task));
-            rtype rc = CreateReplyTask(std::forward<ReplyStdBindFunc>(reply), reply_weakptr);
-
-            auto task = std::bind(ReturnAsParamAdapter<ttype, rtype>, tc, rc);
-            g_thread_map[tid]->PostTask(task);
-
-            operate = true;
-        }
-
-        return operate;
-    }
-
-    template<typename TaskStdBindFunc, typename TaskClassType, typename ReplyStdBindFunc, typename ReplyClassType>
-    bool PostTaskAndReplyWithResult(
-        int tid,
-        TaskStdBindFunc &&task,
-        std::weak_ptr<TaskClassType> &task_weakptr,
-        ReplyStdBindFunc &&reply,
-        std::weak_ptr<ReplyClassType> &reply_weakptr
-        )
-    {
-        bool operate = false;
-
-        if (g_thread_map.find(tid) != g_thread_map.end())
-        {
-            using ttype = std::decay<std::shared_ptr<Callback<true, TaskClassType, true, TaskStdBindFunc>>>::type;
-            using rtype = std::decay<std::shared_ptr<Callback<true, ReplyClassType, false, ReplyStdBindFunc>>>::type;
-            ttype tc = CreateTask(std::forward<TaskStdBindFunc>(task), task_weakptr);
-            rtype rc = CreateReplyTask(std::forward<ReplyStdBindFunc>(reply), reply_weakptr);
-
-            auto task = std::bind(ReturnAsParamAdapter<ttype, rtype>, tc, rc);
-            g_thread_map[tid]->PostTask(task);
-
-            operate = true;
-        }
-
-        return operate;
-    }
-
-    // weak_ptr
-    template <typename T>
-    std::weak_ptr<T> GetWeakPtr(T* ptr)
-    {
-        return GetWeakPtr(std::shared_ptr<T>(ptr));
-    }
-
-    template <typename T>
-    std::weak_ptr<T> GetWeakPtr(std::shared_ptr<T>& ptr)
-    {
-        return std::weak_ptr<T>(ptr);
     }
 
     // semphore
@@ -525,153 +116,6 @@ namespace
         std::mutex mutex_;
         std::condition_variable condition_var_;
     };
-
-    // thread
-    class CThread : public std::enable_shared_from_this<CThread>
-    {
-    public:
-        static std::shared_ptr<CThread> GetThread(const std::thread::id &id)
-        {
-            std::lock_guard<std::mutex> lock(thread_map_mutex_);
-            if (thread_map_.find(id) != thread_map_.end())
-            {
-                return thread_map_[id];
-            }
-            return std::shared_ptr<CThread>();
-        }
-
-        CThread()
-        {
-        }
-
-        virtual ~CThread()
-        {
-            StopSoon();
-        }
-
-        CThread(CThread &right) = delete;
-
-        CThread& operator=(CThread &right) = delete;
-
-        template <typename StdBindFunc>
-        void PostTask(StdBindFunc &&closure)
-        {
-            if (!thread_)
-            {
-                assert(false);
-                return;
-            }
-
-            PostBaseTask(std::shared_ptr<CallbackBase>(
-                std::move(CreateTask(std::forward<StdBindFunc>(closure)))));
-        }
-
-        template <class StdBindFunc, typename T>
-        void PostTask(StdBindFunc &&closure, std::weak_ptr<T> &weakptr)
-        {
-            if (!thread_)
-            {
-                assert(false);
-                return;
-            }
-
-            PostBaseTask(std::shared_ptr<CallbackBase>(
-                std::move(CreateTask(std::forward<StdBindFunc>(closure), weakptr))));
-        }
-
-        void Run()
-        {
-            assert(!thread_);
-
-            keep_working_ = true;
-            thread_.reset(new std::thread(&CThread::ThreadFunc, std::weak_ptr<CThread>(shared_from_this())));
-            id_ = thread_->get_id();
-
-            std::lock_guard<std::mutex> lock(thread_map_mutex_);
-            thread_map_[id_] = shared_from_this();
-        }
-
-        void Stop()
-        {
-            keep_working_ = false;
-            semphore_.stop();
-        }
-
-        void Join()
-        {
-            if (thread_ && thread_->joinable())
-            {
-                thread_->join();
-            }
-        }
-
-        void StopSoon()
-        {
-            Stop();
-            Join();
-            thread_.reset();
-        }
-
-    protected:
-        void PostBaseTask(std::shared_ptr<CallbackBase> &task)
-        {
-            {
-                std::unique_lock<std::mutex> lock(task_mutex_);
-                task_list.push(task);
-            }
-
-            semphore_.signal();
-        }
-
-    private:
-        static void ThreadFunc(std::weak_ptr<CThread> weakptr)
-        {
-            std::shared_ptr<CThread> pThis = weakptr.lock();
-            if (pThis)
-            {
-                pThis->_ThreadFunc();
-            }
-        }
-
-        void _ThreadFunc()
-        {
-            while (keep_working_ && semphore_.wait())
-            {
-                std::shared_ptr<CallbackBase> task;
-                {
-                    std::unique_lock<std::mutex> lock(task_mutex_);
-                    if (!task_list.empty())
-                    {
-                        task = task_list.front();
-                        task_list.pop();
-                    }
-                }
-                if (task)
-                {
-                    task->Run();
-                }
-            }
-
-            std::lock_guard<std::mutex> lock(thread_map_mutex_);
-            thread_map_.erase(id_);
-        }
-
-    private:
-        std::shared_ptr<std::thread> thread_;
-        std::thread::id id_;
-        semphore semphore_;
-        std::mutex task_mutex_;
-        std::queue<std::shared_ptr<CallbackBase>> task_list;
-        bool keep_working_ = true;
-
-        static std::mutex thread_map_mutex_;
-        static std::map<std::thread::id, std::shared_ptr<CThread>> thread_map_;
-    };
-    std::mutex CThread::thread_map_mutex_;
-    std::map<std::thread::id, std::shared_ptr<CThread>> CThread::thread_map_;
-
-    // test
-    std::map<int, std::shared_ptr<CThread>> g_thread_map;
 
     void async_call_void()
     {
@@ -748,31 +192,6 @@ namespace
         void post_task_and_reply(int index)
         {
             print_func("WeakptrTest::post_task_and_reply");
-
-            int i = 2 - index;
-            i = (i == index) ? 0 : i;
-            std::string ss;
-            std::shared_ptr<WeakptrTest> obj(new WeakptrTest);
-            // member -> global
-            PostTaskAndReplyWithResult(i, 
-                std::bind(&WeakptrTest::print_string, obj.get()),
-                GetWeakPtr(obj),
-                std::bind(on_async_call_string, std::placeholders::_1));
-            // global -> member
-            PostTaskAndReplyWithResult(i,
-                std::bind(async_call_string, 4.55f),
-                std::bind(&WeakptrTest::on_print_string, this, std::placeholders::_1), 
-                GetWeakPtr(shared_from_this()));
-            // member -> member
-            PostTaskAndReplyWithResult(i,
-                std::bind(&WeakptrTest::print_string, this), 
-                GetWeakPtr(shared_from_this()),
-                std::bind(&WeakptrTest::on_print_string, this, std::placeholders::_1), 
-                GetWeakPtr(shared_from_this()));
-            // global -> global
-            PostTaskAndReplyWithResult(i, 
-                std::bind(async_call_string, 3.15f), 
-                std::bind(on_async_call_string, std::placeholders::_1));
         }
 
     private:
@@ -783,47 +202,16 @@ namespace
 
 void chromium_post_task_study()
 {
-    using namespace std::placeholders;
-    std::shared_ptr<WeakptrTest> obj(new WeakptrTest());
-
-    //auto fc = std::bind(on_async_call_value, _1);
-    //auto aa = fc;
-    //aa();
-
-    //auto mf = std::move(std::bind(&WeakptrTest::print_param, obj, _1));
-    //mf(1);
-
-    auto gt = CreateTask(std::bind(async_call_value, 3.18f));
-    gt->Run();
-    auto gret = gt->RunWithResult();
-
-    auto mt = CreateTask(std::bind(&WeakptrTest::print_param, obj.get(), 2345), std::weak_ptr<WeakptrTest>(obj));
-    //obj.reset();
-    mt->Run();
-    auto mret = mt->RunWithResult();
-
+    base::PlatformThread::SetName("tests_console_chromium_example");
     std::cout << "------------------------------------" << std::endl;
 
-    auto gtr = CreateReplyTask(std::bind(async_call_value, _1));
-    //gtr->Run();
-    auto gretr = gtr->RunWithParam(4.5f);
-
-    auto mtr = CreateReplyTask(std::bind(&WeakptrTest::print_param, obj.get(), _1), std::weak_ptr<WeakptrTest>(obj));
-    //obj.reset();
-    //mtr->Run();
-    auto mretr = mtr->RunWithParam(-343);
-
-    //std::function<void(const std::string&)> ff = std::bind(on_async_call_value, "asd");
-
-    std::cout << "------------------------------------" << std::endl;
-
-    g_thread_map[0] = std::shared_ptr<CThread>(new CThread());
+    /*g_thread_map[0] = std::shared_ptr<CThread>(new CThread());
     g_thread_map[1] = std::shared_ptr<CThread>(new CThread());
     g_thread_map[2] = std::shared_ptr<CThread>(new CThread());
     for (auto &thd : g_thread_map)
     {
         thd.second->Run();
-    }
+    }*/
 
     bool work = true;
     int index = 0;
@@ -839,7 +227,7 @@ void chromium_post_task_study()
         break;
         default:
         {
-            int i = index++;
+            /*int i = index++;
             int thd = i % 3;
             switch (thd)
             {
@@ -857,15 +245,15 @@ void chromium_post_task_study()
                 break;
             default:
                 break;
-            }
+            }*/
         }
         break;
         }
     }
 
-    for (auto &thd : g_thread_map)
+    /*for (auto &thd : g_thread_map)
     {
         thd.second->StopSoon();
     }
-    g_thread_map.clear();
+    g_thread_map.clear();*/
 }

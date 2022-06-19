@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <functional>
-#include "functional/callback.h"
 
 
 /*
@@ -26,7 +25,7 @@
 
 using namespace std::placeholders;
 
-// https://www.cnblogs.com/qicosmos/p/4325949.html 可变模版参数
+// https://www.cnblogs.com/qicosmos/p/4325949.html 鍙彉妯＄増鍙傛暟
 namespace
 {
     class TestBindCls
@@ -76,32 +75,5 @@ void thread_std_bind_task_study()
     sfn("sfn");
     bwp("bwp");
     rwp("rwp");*/
-
-    auto nfn = mctm::Bind(&TestBindCls::Run, wp, "wp");
-    auto ret = nfn.Run();
-
-    mctm::Closure cfn(mctm::Bind(&TestBindCls::RunConst, sp, "sp"));
-    cfn.Run();
-
-    auto rnfn = mctm::Bind(&TestBindCls::Run, sp.get(), "raw");
-    auto rnret = rnfn.Run();
-
-    auto sfn = mctm::Bind(TestBindCls::CreateObject, "CreateObject");
-    auto obj = sfn.Run();
-
-    auto gfn = mctm::Bind(GlobalRun, "GlobalRun");
-    auto gret = gfn.Run();
-
-    auto ld  = std::bind([](const std::string& str) {}, "GlobalRun");
-
-    /*auto ldfn = mctm::Bind(InvokeLambda<>, ld);
-    auto ldret = ldfn.Run();*/
-
-    mctm::Closure cgfn(mctm::Bind(GlobalRun, "Closure"));
-    mctm::Closure cc = cgfn;
-    mctm::Closure cl(cgfn);
-    cc.Run();
-    cl.Run();
-
     return;
 }

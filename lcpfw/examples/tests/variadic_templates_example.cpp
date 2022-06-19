@@ -8,12 +8,12 @@
 // http://www.cnblogs.com/qicosmos/p/4309835.html
 namespace
 {
-    //µİ¹éÖÕÖ¹º¯Êı
+    //ÂµÃÂ¹Ã©Ã–Ã•Ã–Â¹ÂºÂ¯ÃŠÃ½
     void print()
     {
         std::cout << "empty" << std::endl;
     }
-    //Õ¹¿ªº¯Êı
+    //Ã•Â¹Â¿ÂªÂºÂ¯ÃŠÃ½
     template <class T, class... Args>
     void print(T head, Args... rest)
     {
@@ -152,7 +152,7 @@ namespace
     };
 }
 
-//²âÊÔ´úÂë
+//Â²Ã¢ÃŠÃ”Â´ÃºÃ‚Ã«
 void variadic_templates_example()
 {
     auto tt = std::is_integral<int>::value;

@@ -1,4 +1,4 @@
-// console_app.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// console_app.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -47,7 +47,7 @@ public:
     {
     }
 
-    // º¯Êı¶ÔÏó
+    // å‡½æ•°å¯¹è±¡
     bool operator()()
     {
         return false;
@@ -73,11 +73,11 @@ void vector_study()
         th.print();
         th.set_p(1);
     }
-    // for each·ÇÒıÓÃÃ¶¾Ù»áÒıÆğ¶ÔÏó¿½±´¹¹Ôì£¬¶øÒıÓÃÃ¶¾ÙÖ»ÄÜÓÃconst
+    // for eachéå¼•ç”¨æšä¸¾ä¼šå¼•èµ·å¯¹è±¡æ‹·è´æ„é€ ï¼Œè€Œå¼•ç”¨æšä¸¾åªèƒ½ç”¨const
     for each (const Pred &var in vct)
     {
         var.print();
-        //var.set_p(1);// constÃ¶¾Ù²»ÄÜµ÷ÓÃ
+        //var.set_p(1);// constæšä¸¾ä¸èƒ½è°ƒç”¨
     }
 }
 
@@ -94,17 +94,15 @@ void shuffle_example()
 
 void right_ref_study();
 void auto_decltype_study();
-void thread_atomic_study();
 void variadic_templates_example();
 void thread_std_bind_task_study();
-//void chromium_post_task_study();
+void chromium_post_task_study();
 void effective_example();
 void thread_message_example();
 void dead_lock_example();
 void ipv6_example();
 void ipc_example();
 void mctm_example();
-void chromium_ipc_example();
 void vector_operation_study();
 void try_except_test();
 void stl_container_example();
@@ -187,8 +185,9 @@ int _tmain(int argc, _TCHAR* argv[])
     ClsAMemFn pFun = &TestA::FuncA;
     (a.*pFun)();*/
 
+    chromium_post_task_study();
     //vector_study();
-    right_ref_study();
+    //right_ref_study();
     //auto_decltype_study();
     //variadic_templates_example();
     //thread_atomic_study();
@@ -200,7 +199,6 @@ int _tmain(int argc, _TCHAR* argv[])
     //ipc_example();
     //thread_std_bind_task_study();
     //mctm_example();
-    //chromium_ipc_example();
     //shuffle_example();
     //vector_operation_study();
     //try_except_test();
