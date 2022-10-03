@@ -110,6 +110,8 @@ void try_except_test();
 void stl_container_example();
 void bus_line_example();
 void TestSort();
+void rdkafka_example();
+void cxx03_example();
 
 initializer e_init_val;
 extern int g_int;
@@ -167,9 +169,6 @@ int _tmain(int argc, _TCHAR* argv[])
     //size_t bytes_read;
     //bytes_read = PERFETTO_EINTR(::recv(0, nullptr, 0, 0));
     
-    std::vector<Pred> vc;
-    vc.emplace_back();
-
     std::cout << std::boolalpha;
 
     /*TestB* pb = new TestB;
@@ -199,7 +198,7 @@ int _tmain(int argc, _TCHAR* argv[])
     //ipv6_example();
     //ipc_example();
     //thread_std_bind_task_study();
-    mctm_example();
+    //mctm_example();
     //chromium_ipc_example();
     //shuffle_example();
     //vector_operation_study();
@@ -207,6 +206,8 @@ int _tmain(int argc, _TCHAR* argv[])
     //stl_container_example();
     //bus_line_example();
     //TestSort();
+    //rdkafka_example();
+    cxx03_example();
     system("pause");
 	return 0;
 }

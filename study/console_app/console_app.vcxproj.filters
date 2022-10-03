@@ -92,6 +92,12 @@
     <ClCompile Include="sort_example.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="rdkafka_example.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cstyle_bind_example.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="console_app.rc">
